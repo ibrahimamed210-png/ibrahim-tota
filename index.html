@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ibrahim & Tota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300..800&family=Baloo+Bhaijaan+2:wght@600;700;800&family=Poppins:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#2a1236;
+    --bg-2:#3d1a4d;
+    --grad-a:#ff6a9c;
+    --grad-b:#a875ff;
+    --grad-c:#ffd166;
+    --grad-d:#ff9466;
+    --glass:rgba(255,255,255,.08);
+    --glass-2:rgba(255,255,255,.11);
+    --glass-border:rgba(255,255,255,.18);
+    --text-hi:#fff7fa;
+    --text-mid:#e6d5e9;
+    --text-dim:#bfa8c4;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Cairo', sans-serif;
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-2) 55%, #331a40);
+    color:var(--text-mid);
+    overflow-x:hidden;
+    min-height:100%;
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+  :focus-visible{outline:2px solid var(--grad-a); outline-offset:3px; border-radius:6px;}
+
+  /* floating hearts rising through the background */
+  .hearts{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
+  .hearts span{
+    position:absolute; bottom:-10%; font-size:16px;
+    animation:rise linear infinite;
+    will-change:transform, opacity;
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(0deg); opacity:0;}
+    10%{opacity:.85;}
+    90%{opacity:.6;}
+    100%{transform:translateY(-115vh) translateX(var(--drift,20px)) rotate(20deg); opacity:0;}
+  }
+
+  /* ---------- PASSWORD SCREEN ---------- */
+  #lock-screen{
+    position:fixed; inset:0; z-index:50;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,95,150,.35), transparent 60%),
+      var(--bg-1);
+    transition:opacity .7s ease, visibility .7s ease;
+  }
+  #lock-screen.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+  .lock-box{
+    background:var(--glass-2);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid var(--glass-border);
+    border-radius:28px;
+    padding:44px 32px;
+    width:100%;
+    max-width:380px;
+    text-align:center;
+    box-shadow:0 30px 70px rgba(0,0,0,.45);
+  }
+  .lock-heart{
+    width:34px; height:34px; margin:0 auto 14px;
+  }
+  .lock-title{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:34px;
+    letter-spacing:.5px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom:6px;
+  }
+  .lock-sub{
+    font-weight:500;
+    font-size:16px;
+    color:var(--text-mid);
+    margin-bottom:28px;
+  }
+  #password-input{
+    width:100%;
+    padding:14px 18px;
+    border-radius:14px;
+    border:1px solid var(--glass-border);
+    background:rgba(255,255,255,.05);
+    font-family:'Cairo', sans-serif;
+    font-size:16px;
+    text-align:center;
+    outline:none;
+    color:var(--text-hi);
+    letter-spacing:2px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  #password-input::placeholder{color:var(--text-dim);}
+  #password-input:focus{border-color:var(--grad-a); box-shadow:0 0 0 4px rgba(255,95,150,.15);}
+  #unlock-btn{
+    margin-top:16px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    transition:transform .2s, box-shadow .2s;
+    box-shadow:0 10px 26px rgba(255,95,150,.3);
+  }
+  #unlock-btn:hover{transform:translateY(-2px); box-shadow:0 14px 32px rgba(255,95,150,.4);}
+  #lock-error{
+    margin-top:12px;
+    color:#ff9db8;
+    font-size:14px;
+    min-height:18px;
+  }
+
+  /* ---------- ADMIN PANEL ---------- */
+  #admin-panel{
+    position:fixed; inset:0; z-index:50;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:20px;
+    overflow-y:auto;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(155,77,255,.35), transparent 60%),
+      var(--bg-1);
+  }
+  #admin-panel.hidden{display:none;}
+  .admin-box{
+    background:var(--glass-2);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid var(--glass-border);
+    border-radius:28px;
+    padding:32px 22px;
+    width:100%;
+    max-width:520px;
+    margin:20px auto 60px;
+    box-shadow:0 30px 70px rgba(0,0,0,.45);
+  }
+  .admin-title{
+    font-family:'Baloo Bhaijaan 2', sans-serif;
+    font-weight:700;
+    font-size:26px;
+    text-align:center;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom:6px;
+  }
+  .admin-sub{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:13.5px;
+    margin-bottom:22px;
+  }
+  #admin-upload-label{
+    display:block;
+    text-align:center;
+    padding:16px;
+    border:1.5px dashed var(--glass-border);
+    border-radius:14px;
+    color:var(--text-mid);
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    margin-bottom:18px;
+    transition:background .2s, border-color .2s;
+  }
+  #admin-upload-label:hover{background:rgba(255,255,255,.04); border-color:var(--grad-a);}
+  #admin-photo-input{display:none;}
+  .admin-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .admin-pic-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--glass-border);
+  }
+  .admin-pic-wrap img,
+  .admin-pic-wrap video{width:100%; height:100%; object-fit:cover; display:block;}
+  .admin-pic-wrap .del-btn{
+    position:absolute; top:5px; left:5px;
+    width:24px; height:24px;
+    border:none; border-radius:50%;
+    background:rgba(20,10,25,.65);
+    color:#fff;
+    font-size:13px; line-height:1;
+    cursor:pointer;
+  }
+  #admin-empty-note{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:14px;
+    padding:6px 0 16px;
+  }
+  #admin-done-btn{
+    display:block;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+  }
+  #admin-note{
+    text-align:center;
+    color:var(--grad-c);
+    font-size:13px;
+    font-weight:600;
+    margin-top:12px;
+    min-height:16px;
+  }
+
+  /* ---------- MAIN SITE ---------- */
+  #site{
+    position:relative; z-index:2;
+    max-width:640px;
+    margin:0 auto;
+    padding:48px 18px 140px;
+    opacity:0;
+    transition:opacity 1s ease;
+  }
+  #site.show{opacity:1;}
+
+  header.hero{
+    text-align:center;
+    padding:20px 10px 8px;
+  }
+  .names{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:clamp(36px,10vw,52px);
+    letter-spacing:.5px;
+    background:linear-gradient(100deg,#ffd3e2,var(--grad-a) 45%,var(--grad-b));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    line-height:1.15;
+  }
+  .hero-line{
+    margin-top:10px;
+    font-weight:500;
+    font-size:16px;
+    color:var(--text-dim);
+  }
+  .divider{
+    width:64px; height:3px; margin:26px auto 0;
+    border-radius:3px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+  }
+
+  .glass-card{
+    background:var(--glass);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--glass-border);
+    border-radius:24px;
+    padding:30px 24px;
+  }
+
+  section{margin-bottom:30px;}
+  section h2{
+    font-weight:800;
+    font-size:20px;
+    color:var(--text-hi);
+    text-align:center;
+    margin-bottom:22px;
+  }
+  section h2 .dot{color:var(--grad-a);}
+
+  /* ---- counter ---- */
+  .counter-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    text-align:center;
+  }
+  .counter-box{
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--glass-border);
+    border-radius:16px;
+    padding:16px 4px;
+  }
+  .counter-num{
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px,6vw,32px);
+    background:linear-gradient(180deg,#fff,var(--grad-a));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .counter-label{
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-top:4px;
+  }
+  .counter-note{
+    text-align:center;
+    margin-top:18px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-mid);
+  }
+
+  /* ---- stop section + flip cards ---- */
+  .stop-line{
+    font-family:'Baloo Bhaijaan 2', sans-serif;
+    font-weight:700;
+    font-size:clamp(22px,5.5vw,28px);
+    text-align:center;
+    color:var(--text-hi);
+    margin-bottom:28px;
+  }
+  .mini-words{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    margin-bottom:36px;
+  }
+  .mini-word{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    font-weight:800;
+    font-size:21px;
+    color:var(--text-hi);
+    background:rgba(255,255,255,.07);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--glass-border);
+    border-radius:999px;
+    padding:12px 26px;
+    width:fit-content;
+  }
+  .mini-word svg{width:22px; height:22px; flex:0 0 auto;}
+  .cards-line{
+    text-align:center;
+    font-family:'Baloo Bhaijaan 2', sans-serif;
+    font-weight:600;
+    font-size:19px;
+    color:var(--text-mid);
+    margin:32px 0 18px;
+  }
+  .flip-cards-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  .flip-card{aspect-ratio:3/4; perspective:1000px; cursor:pointer;}
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .6s;
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-front, .flip-back{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    border-radius:16px;
+    border:1px solid var(--glass-border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px; padding:12px;
+  }
+  .flip-front{background:linear-gradient(135deg,rgba(255,45,120,.3),rgba(139,47,255,.3));}
+  .flip-back{
+    transform:rotateY(180deg);
+    background:linear-gradient(135deg,rgba(255,194,51,.24),rgba(255,95,61,.24));
+  }
+  .flip-front span, .flip-back span{
+    font-weight:800; font-size:16px; color:var(--text-hi);
+    text-align:center; line-height:1.45;
+  }
+  .flip-heart-icon{width:22px; height:22px; flex:0 0 auto;}
+
+  /* ---- letter ---- */
+  .letter{
+    font-weight:400;
+    font-size:16.5px;
+    line-height:2.05;
+    color:var(--text-mid);
+    white-space:pre-line;
+    text-align:justify;
+  }
+  .letter .signature{
+    display:flex; align-items:center; gap:10px;
+    margin-top:22px;
+    font-family:'Great Vibes', cursive;
+    font-size:34px;
+    color:var(--text-hi);
+  }
+  .heart-icon{width:22px; height:22px; flex:0 0 auto;}
+
+  /* ---- reply ---- */
+  #reply-box{
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid var(--glass-border);
+    background:rgba(255,255,255,.05);
+    font-family:'Cairo', sans-serif;
+    font-size:15.5px;
+    color:var(--text-hi);
+    resize:vertical;
+    outline:none;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  #reply-box::placeholder{color:var(--text-dim);}
+  #reply-box:focus{border-color:var(--grad-a); box-shadow:0 0 0 4px rgba(255,95,150,.12);}
+  #save-reply-btn{
+    display:block;
+    margin:16px auto 0;
+    padding:12px 36px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    transition:transform .2s;
+  }
+  #save-reply-btn:hover{transform:translateY(-1px);}
+  #reply-saved-note{
+    text-align:center;
+    color:var(--grad-c);
+    font-size:13.5px;
+    font-weight:600;
+    margin-top:10px;
+    min-height:16px;
+  }
+
+  /* ---- gallery ---- */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .pic-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--glass-border);
+    transition:transform .25s ease;
+  }
+  .pic-wrap:hover{transform:scale(1.04);}
+  .pic-wrap img,
+  .pic-wrap video{width:100%; height:100%; object-fit:cover; display:block;}
+  .pic-wrap .del-btn{
+    position:absolute; top:6px; left:6px;
+    width:24px; height:24px;
+    border:none; border-radius:50%;
+    background:rgba(20,10,25,.55);
+    backdrop-filter:blur(4px);
+    color:#fff;
+    font-size:13px; line-height:1;
+    cursor:pointer;
+  }
+  .empty-note{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:14.5px;
+    padding:6px 0 18px;
+  }
+  #upload-label{
+    display:block;
+    text-align:center;
+    padding:14px;
+    border:1.5px dashed var(--glass-border);
+    border-radius:14px;
+    color:var(--text-mid);
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:background .2s, border-color .2s;
+  }
+  #upload-label:hover{background:rgba(255,255,255,.04); border-color:var(--grad-a);}
+  #photo-input{display:none;}
+
+  footer.credit{
+    text-align:center;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-top:8px;
+  }
+
+  /* ---------- music player: floating glass pill ---------- */
+  #player-bar{
+    position:fixed; bottom:18px; left:50%;
+    transform:translate(-50%,140%);
+    z-index:40;
+    display:flex; align-items:center; gap:10px;
+    background:var(--glass-2);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid var(--glass-border);
+    border-radius:999px;
+    padding:8px 10px 8px 16px;
+    max-width:92vw;
+    box-shadow:0 18px 40px rgba(0,0,0,.4);
+    transition:transform .6s ease;
+  }
+  #player-bar.show{transform:translate(-50%,0);}
+  #play-toggle{
+    flex:0 0 auto;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #song-info{
+    font-size:13.5px;
+    color:var(--text-mid);
+    max-width:150px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  #song-info b{color:var(--text-hi); font-weight:700;}
+  .note-icon{font-size:14px; animation:spin 3s linear infinite; animation-play-state:paused; display:inline-block;}
+  .note-icon.playing{animation-play-state:running;}
+  @keyframes spin{from{transform:rotate(0)} to{transform:rotate(360deg)}}
+  #song-upload-btn{
+    flex:0 0 auto;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--glass-border);
+    background:transparent;
+    color:var(--text-mid);
+    font-size:13px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #song-upload-btn:hover{background:rgba(255,255,255,.06); color:var(--text-hi);}
+</style>
+</head>
+<body>
+
+<div class="hearts" id="hearts" aria-hidden="true"></div>
+
+<!-- ================= PASSWORD SCREEN ================= -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <svg class="lock-heart" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="hg1" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#ff5f96"/><stop offset="1" stop-color="#8a5cff"/></linearGradient></defs>
+      <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
+    </svg>
+    <div class="lock-title">Ibrahim &amp; Tota</div>
+    <div class="lock-sub">جاهزة يا روحي؟ 💕</div>
+    <input type="password" id="password-input" placeholder="l o v e" />
+    <button id="unlock-btn">افتحي 💗</button>
+    <div id="lock-error"></div>
+  </div>
+</div>
+
+<!-- ================= ADMIN PANEL ================= -->
+<div id="admin-panel" class="hidden">
+  <div class="admin-box">
+    <div class="admin-title">لوحة التحكم</div>
+    <div class="admin-sub">ضيفي أو احذفي صور وفيديوهات "لحظاتنا"</div>
+
+    <label id="admin-upload-label" for="admin-photo-input">📷 دوسي هنا لإضافة صور أو فيديوهات</label>
+    <input type="file" id="admin-photo-input" accept="image/*,video/*" multiple />
+
+    <div class="admin-grid" id="admin-grid"></div>
+    <div id="admin-empty-note">لسه مفيش صور أو فيديوهات مضافة</div>
+
+    <button id="admin-done-btn">خلصت، وريني الموقع 💗</button>
+    <div id="admin-note"></div>
+  </div>
+</div>
+
+<!-- ================= MAIN SITE ================= -->
+<div id="site">
+
+  <header class="hero">
+    <div class="names">Ibrahim <span style="color:var(--grad-c); font-size:.7em;">&amp;</span> Tota</div>
+    <div class="hero-line">كل تفصيلة هنا ليكي يا توتا</div>
+    <div class="divider"></div>
+  </header>
+
+  <section id="counter-section">
+    <h2><span class="dot">·</span> إحنا مع بعض بقالنا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div class="counter-grid">
+        <div class="counter-box"><div class="counter-num" id="c-days">0</div><div class="counter-label">يوم</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-hours">0</div><div class="counter-label">ساعة</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-mins">0</div><div class="counter-label">دقيقة</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-secs">0</div><div class="counter-label">ثانية</div></div>
+      </div>
+      <div class="counter-note">وكل ثانية فيهم بتساوي الدنيا 🌷</div>
+    </div>
+  </section>
+
+  <section id="stop-section" style="margin-top:44px;">
+    <div class="glass-card">
+      <div class="stop-line">😂اقفي هنا شوية متجريش</div>
+      <div class="mini-words">
+        <div class="mini-word">
+          <svg viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+          <span>بحبك</span>
+          <svg viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+        </div>
+        <div class="mini-word">
+          <svg viewBox="0 0 24 24" fill="var(--grad-c)" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 7.1-1.01L12 2z"/></svg>
+          <span>بموت فيكي</span>
+          <svg viewBox="0 0 24 24" fill="var(--grad-c)" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 7.1-1.01L12 2z"/></svg>
+        </div>
+        <div class="mini-word">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--grad-b)" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>أغلى ما ليا</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--grad-b)" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cards-section" style="margin-top:26px;">
+    <div class="glass-card">
+      <div class="cards-line">❤😉 دوسي علي الكروت</div>
+      <div class="flip-cards-grid">
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span>😂🙋اول كارت اهوووو</span></div>
+            <div class="flip-back">
+              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+              <span>محبتش</span>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span>التاني</span></div>
+            <div class="flip-back">
+              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+              <span>ولا بحب</span>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span>التالت</span></div>
+            <div class="flip-back">
+              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+              <span>ولا هحب حد</span>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span>الرابع</span></div>
+            <div class="flip-back">
+              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
+              <span>زي ما حبيتك يا اجمل حاجه في حياتي ❤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="letter-section">
+    <h2><span class="dot">·</span> كلمة من قلبي <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div class="letter" id="letter-text">توتا يا روحي،
+
+هكتبلك كام سطر مش عشان اعبر عن كل اللي جوايا ده مستحيل يتقال بالكلام اصلا بس الكلام ده اقل حاجه تتوصف من حبي ليكي.
+
+من ساعه ما دخلتي حياتي وانا حاسس ان كل حاجه بقي ليها طعم تاني. ضحكتك بتنسيني تعبي وهمومي، وصوتك اول ما اسمعه بيريح قلبي، وكلامك الحلو ده اللي بيخلني احس ان مفيش حاجه.
+
+مفيش كلام يكفي يوصفلك حجم اللي حاسس بيه لما تكوني معايا يا قلبي.
+
+بحبك يا نور عيني وحياتي كلها.
+        <div class="signature">
+          <svg class="heart-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
+          </svg>
+          Ibrahim
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reply-section">
+    <h2><span class="dot">·</span> دلوقتي دورك يا توتا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <textarea id="reply-box" placeholder="اكتبيلي اللي في قلبك يا توتا... 💌" rows="5"></textarea>
+      <button id="save-reply-btn">احفظي 💗</button>
+      <div id="reply-saved-note"></div>
+    </div>
+  </section>
+
+  <section id="gallery-section">
+    <h2><span class="dot">·</span> لحظاتنا <span class="dot">·</span></h2>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <div class="empty-note" id="empty-note">لسه مفيش صور أو فيديوهات هنا</div>
+  </section>
+
+  <footer class="credit">بحبك من كل قلبي 💗</footer>
+</div>
+
+<!-- ================= MUSIC PLAYER ================= -->
+
+<div id="player-bar">
+  <button id="play-toggle">▶</button>
+  <div id="song-info"><span class="note-icon" id="note-icon">🎵</span> <b id="song-name">توليت — إنت حبيبي</b></div>
+  <audio id="bg-audio" src="song.mp3" loop preload="none"></audio>
+</div>
+
+<script>
+/* ================= floating hearts (single ambient effect) ================= */
+(function(){
+  const wrap = document.getElementById('hearts');
+  for(let i=0;i<5;i++){
+    const s = document.createElement('span');
+    s.textContent = '❤️';
+    s.style.left = Math.random()*100+'%';
+    s.style.fontSize = (14+Math.random()*14)+'px';
+    s.style.setProperty('--drift', (Math.random()*60-30)+'px');
+    s.style.animationDuration = (14+Math.random()*14)+'s';
+    s.style.animationDelay = (Math.random()*16)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
+/* ================= password lock ================= */
+const CORRECT_PASSWORD = "love";
+const ADMIN_PASSWORD = "admin2026";
+const lockScreen = document.getElementById('lock-screen');
+const pwInput = document.getElementById('password-input');
+const unlockBtn = document.getElementById('unlock-btn');
+const lockError = document.getElementById('lock-error');
+const site = document.getElementById('site');
+const playerBar = document.getElementById('player-bar');
+const audio = document.getElementById('bg-audio');
+const adminPanel = document.getElementById('admin-panel');
+
+function enterSite(){
+  lockScreen.classList.add('hidden');
+  adminPanel.classList.add('hidden');
+  site.classList.add('show');
+  playerBar.classList.add('show');
+  startCounter();
+  attemptAutoplay();
+}
+
+function tryUnlock(){
+  const val = pwInput.value.trim().toLowerCase();
+  if(val === CORRECT_PASSWORD){
+    enterSite();
+  } else if(val === ADMIN_PASSWORD){
+    lockScreen.classList.add('hidden');
+    renderAdminGrid();
+  } else {
+    lockError.textContent = "الباسورد غلط، جربي تاني 🌷";
+    pwInput.value = '';
+  }
+}
+unlockBtn.addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+
+/* ================= counter ================= */
+// تاريخ البداية متخزن هنا من غير ما يتعرض في الصفحة
+const START_TIME = new Date(2026, 7, 9, 3, 6, 0).getTime(); // شهر 7 = أغسطس (index من صفر)
+
+function startCounter(){
+  updateCounter();
+  setInterval(updateCounter, 1000);
+}
+function updateCounter(){
+  const now = Date.now();
+  let diff = Math.max(0, now - START_TIME);
+  const days = Math.floor(diff/(1000*60*60*24));
+  const hours = Math.floor((diff/(1000*60*60))%24);
+  const mins = Math.floor((diff/(1000*60))%60);
+  const secs = Math.floor((diff/1000)%60);
+  document.getElementById('c-days').textContent = days;
+  document.getElementById('c-hours').textContent = hours;
+  document.getElementById('c-mins').textContent = mins;
+  document.getElementById('c-secs').textContent = secs;
+}
+
+/* ================= music player (song is fixed — set via song.mp3) ================= */
+const playToggle = document.getElementById('play-toggle');
+const noteIcon = document.getElementById('note-icon');
+
+function attemptAutoplay(){
+  if(!audio.src) return;
+  const p = audio.play();
+  if(p !== undefined){
+    p.then(()=>{ setPlayingUI(true); })
+     .catch(()=>{ setPlayingUI(false); });
+  }
+}
+function setPlayingUI(playing){
+  playToggle.textContent = playing ? '⏸' : '▶';
+  noteIcon.classList.toggle('playing', playing);
+}
+playToggle.addEventListener('click', ()=>{
+  if(audio.paused){
+    audio.play().then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false));
+  } else {
+    audio.pause();
+    setPlayingUI(false);
+  }
+});
+audio.addEventListener('pause', ()=>setPlayingUI(false));
+audio.addEventListener('play', ()=>setPlayingUI(true));
+
+/* ================= flip cards ================= */
+document.querySelectorAll('.flip-card').forEach(card=>{
+  card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); });
+});
+
+/* ================= gallery: photos & videos (managed from admin panel) ================= */
+const galleryGrid = document.getElementById('gallery-grid');
+const emptyNote = document.getElementById('empty-note');
+const GALLERY_KEY = 'ibrahim_tota_gallery';
+
+function loadGalleryItems(){
+  try{
+    const raw = localStorage.getItem(GALLERY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveGalleryItems(items){
+  try{
+    localStorage.setItem(GALLERY_KEY, JSON.stringify(items));
+    return true;
+  }catch(e){ return false; }
+}
+
+function renderGallery(){
+  const items = loadGalleryItems();
+  galleryGrid.innerHTML = '';
+  emptyNote.style.display = items.length ? 'none' : 'block';
+  items.forEach(item=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'pic-wrap';
+    let media;
+    if(item.type === 'video'){
+      media = document.createElement('video');
+      media.src = item.src;
+      media.controls = true;
+      media.playsInline = true;
+    } else {
+      media = document.createElement('img');
+      media.src = item.src;
+      media.alt = '';
+    }
+    wrap.appendChild(media);
+    galleryGrid.appendChild(wrap);
+  });
+}
+renderGallery();
+
+/* ================= admin panel: add/remove gallery media ================= */
+const adminGrid = document.getElementById('admin-grid');
+const adminEmptyNote = document.getElementById('admin-empty-note');
+const adminPhotoInput = document.getElementById('admin-photo-input');
+const adminDoneBtn = document.getElementById('admin-done-btn');
+const adminNote = document.getElementById('admin-note');
+
+function renderAdminGrid(){
+  const items = loadGalleryItems();
+  adminGrid.innerHTML = '';
+  adminEmptyNote.style.display = items.length ? 'none' : 'block';
+  items.forEach((item, idx)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'admin-pic-wrap';
+    let media;
+    if(item.type === 'video'){
+      media = document.createElement('video');
+      media.src = item.src;
+      media.muted = true;
+    } else {
+      media = document.createElement('img');
+      media.src = item.src;
+      media.alt = '';
+    }
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn';
+    delBtn.textContent = '✕';
+    delBtn.addEventListener('click', ()=>{
+      const current = loadGalleryItems();
+      current.splice(idx,1);
+      saveGalleryItems(current);
+      renderAdminGrid();
+    });
+    wrap.appendChild(media);
+    wrap.appendChild(delBtn);
+    adminGrid.appendChild(wrap);
+  });
+  adminPanel.classList.remove('hidden');
+}
+
+adminPhotoInput.addEventListener('change', (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  let remaining = files.length;
+  const current = loadGalleryItems();
+  files.forEach(file=>{
+    const type = file.type.startsWith('video') ? 'video' : 'image';
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      current.push({ src: reader.result, type });
+      remaining--;
+      if(remaining === 0){
+        const ok = saveGalleryItems(current);
+        adminNote.textContent = ok ? 'اتضافوا 💗' : 'الملفات كبيرة قوي، جربي صور أقل حجمًا';
+        renderAdminGrid();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  adminPhotoInput.value = '';
+});
+
+adminDoneBtn.addEventListener('click', ()=>{
+  renderGallery();
+  enterSite();
+});
+
+/* ================= her reply box ================= */
+const replyBox = document.getElementById('reply-box');
+const saveReplyBtn = document.getElementById('save-reply-btn');
+const replySavedNote = document.getElementById('reply-saved-note');
+const REPLY_KEY = 'ibrahim_tota_reply';
+
+function loadReply(){
+  const saved = localStorage.getItem(REPLY_KEY);
+  if(saved){ replyBox.value = saved; }
+}
+saveReplyBtn.addEventListener('click', ()=>{
+  localStorage.setItem(REPLY_KEY, replyBox.value);
+  replySavedNote.textContent = 'اتحفظ يا قمر 💌';
+  setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500);
+});
+loadReply();
+</script>
+</body>
+</html>
