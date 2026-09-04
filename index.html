@@ -992,6 +992,21 @@ async function saveReply(){
 }
 saveReplyBtn.addEventListener('click', saveReply);
 loadReply();
+
+/* check for new messages every few seconds, without overwriting what you're actively typing */
+setInterval(async ()=>{
+  if(document.activeElement === replyBox) return; // don't interrupt while typing
+  try{
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': BIN_KEY }
+    });
+    const data = await res.json();
+    const latest = (data.record && data.record.reply) || '';
+    if(latest !== replyBox.value){
+      replyBox.value = latest;
+    }
+  }catch(e){ /* silent — will retry next interval */ }
+}, 4000);
 </script>
 </body>
 </html>
