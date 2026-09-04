@@ -455,6 +455,146 @@
     min-height:16px;
   }
 
+  /* ---- chat corner ---- */
+  #chat-name-gate{
+    text-align:center;
+    padding:10px 0;
+  }
+  #chat-name-gate p{
+    color:var(--text-mid);
+    font-size:14.5px;
+    margin-bottom:14px;
+  }
+  .chat-name-btns{display:flex; gap:10px; justify-content:center;}
+  .chat-name-btn{
+    flex:1; max-width:150px;
+    padding:12px;
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+    color:var(--text-hi);
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+  .chat-name-btn:active{background:rgba(255,255,255,.14);}
+  #chat-window.hidden, #chat-name-gate.hidden{display:none;}
+  #chat-messages{
+    display:flex; flex-direction:column; gap:8px;
+    max-height:320px; overflow-y:auto;
+    padding:6px 2px 10px;
+    margin-bottom:12px;
+  }
+  .chat-bubble-wrap{
+    display:flex; flex-direction:column;
+    max-width:78%;
+    position:relative;
+  }
+  .chat-bubble-wrap.mine{align-self:flex-end; align-items:flex-end;}
+  .chat-bubble-wrap.theirs{align-self:flex-start; align-items:flex-start;}
+  .chat-bubble{
+    max-width:100%;
+    padding:9px 14px;
+    border-radius:16px;
+    font-size:14.5px;
+    line-height:1.5;
+    color:var(--text-hi);
+    word-wrap:break-word;
+    cursor:pointer;
+  }
+  .chat-bubble .sender{
+    display:block;
+    font-size:11px;
+    font-weight:700;
+    opacity:.7;
+    margin-bottom:2px;
+  }
+  .chat-bubble-wrap.mine .chat-bubble{
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
+    border-bottom-left-radius:5px;
+  }
+  .chat-bubble-wrap.theirs .chat-bubble{
+    background:rgba(255,255,255,.09);
+    border:1px solid var(--glass-border);
+    border-bottom-right-radius:5px;
+  }
+  .reaction-picker{
+    display:flex; gap:4px;
+    background:rgba(20,10,25,.9);
+    border:1px solid var(--glass-border);
+    border-radius:999px;
+    padding:5px 8px;
+    margin-top:4px;
+  }
+  .reaction-picker.hidden{display:none;}
+  .reaction-picker span{
+    font-size:18px;
+    cursor:pointer;
+    line-height:1;
+  }
+  .reaction-badges{
+    display:flex; gap:2px;
+    margin-top:-8px;
+    background:rgba(20,10,25,.85);
+    border-radius:999px;
+    padding:2px 6px;
+    font-size:12px;
+    z-index:1;
+  }
+  .reaction-badges:empty{display:none;}
+  #chat-empty-note{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:13.5px;
+    padding:10px 0;
+  }
+  .chat-input-row{display:flex; gap:8px;}
+  #chat-input{
+    flex:1;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid var(--glass-border);
+    background:rgba(255,255,255,.05);
+    color:var(--text-hi);
+    font-family:'Cairo', sans-serif;
+    font-size:14.5px;
+  }
+  #chat-input::placeholder{color:var(--text-dim);}
+  #chat-send-btn{
+    padding:0 20px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+  #chat-whoami{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    margin-top:10px;
+  }
+  #chat-status{
+    text-align:center;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-dim);
+    margin-bottom:8px;
+    min-height:16px;
+  }
+  #chat-status.online{color:#7dffb0;}
+  .seen-tick{
+    display:block;
+    font-size:10px;
+    opacity:.75;
+    margin-top:3px;
+    text-align:left;
+  }
+
   /* ---- gallery ---- */
   .gallery-grid{
     display:grid;
@@ -721,6 +861,29 @@
     </div>
   </section>
 
+  <section id="chat-corner">
+    <h2><span class="dot">·</span> ركن الشات بتاعنا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div id="chat-name-gate">
+        <p>إنت مين اللي بيدخل؟</p>
+        <div class="chat-name-btns">
+          <button class="chat-name-btn" data-name="Ibrahim">إبراهيم</button>
+          <button class="chat-name-btn" data-name="Tota">توتا</button>
+        </div>
+      </div>
+      <div id="chat-window" class="hidden">
+        <div id="chat-status"></div>
+        <div id="chat-messages"></div>
+        <div id="chat-empty-note">لسه مفيش رسايل، ابدأ الكلام 💬</div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="اكتب رسالة..." />
+          <button id="chat-send-btn">ابعت</button>
+        </div>
+        <div id="chat-whoami"></div>
+      </div>
+    </div>
+  </section>
+
   <section id="gallery-section">
     <h2><span class="dot">·</span> لحظاتنا <span class="dot">·</span></h2>
     <div class="gallery-grid" id="gallery-grid"></div>
@@ -952,38 +1115,41 @@ adminDoneBtn.addEventListener('click', ()=>{
   enterSite();
 });
 
-/* ================= her reply box (shared via JSONBin) ================= */
-const replyBox = document.getElementById('reply-box');
-const saveReplyBtn = document.getElementById('save-reply-btn');
-const replySavedNote = document.getElementById('reply-saved-note');
-
+/* ================= shared JSONBin setup ================= */
 const BIN_ID = '6a9b0f3bf5f4af5e296b2dfb';
 const BIN_KEY = '$2a$10$kIdsr1b7VkCwH/JZQ/BfyOfytkx.yCI72OkRGSEW4qpwFxcegYGfq';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
+async function fetchBinRecord(){
+  const res = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': BIN_KEY } });
+  const data = await res.json();
+  return data.record || {};
+}
+async function putBinRecord(record){
+  await fetch(BIN_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+    body: JSON.stringify(record)
+  });
+}
+
+/* ================= her reply box ================= */
+const replyBox = document.getElementById('reply-box');
+const saveReplyBtn = document.getElementById('save-reply-btn');
+const replySavedNote = document.getElementById('reply-saved-note');
+
 async function loadReply(){
   try{
-    const res = await fetch(BIN_URL + '/latest', {
-      headers: { 'X-Master-Key': BIN_KEY }
-    });
-    const data = await res.json();
-    replyBox.value = (data.record && data.record.reply) || '';
-  }catch(e){
-    console.error('couldn\'t load reply', e);
-  }
+    const record = await fetchBinRecord();
+    replyBox.value = record.reply || '';
+  }catch(e){ console.error("couldn't load reply", e); }
 }
 
 async function saveReply(){
   replySavedNote.textContent = 'بتتحفظ...';
   try{
-    await fetch(BIN_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': BIN_KEY
-      },
-      body: JSON.stringify({ reply: replyBox.value })
-    });
+    const record = await fetchBinRecord();
+    await putBinRecord({ ...record, reply: replyBox.value });
     replySavedNote.textContent = 'اتحفظ يا قمر 💌';
   }catch(e){
     replySavedNote.textContent = 'حصلت مشكلة، جربي تاني';
@@ -993,20 +1159,184 @@ async function saveReply(){
 saveReplyBtn.addEventListener('click', saveReply);
 loadReply();
 
-/* check for new messages every few seconds, without overwriting what you're actively typing */
-setInterval(async ()=>{
-  if(document.activeElement === replyBox) return; // don't interrupt while typing
-  try{
-    const res = await fetch(BIN_URL + '/latest', {
-      headers: { 'X-Master-Key': BIN_KEY }
-    });
-    const data = await res.json();
-    const latest = (data.record && data.record.reply) || '';
-    if(latest !== replyBox.value){
-      replyBox.value = latest;
+/* ================= chat corner (messages + online/typing/seen) ================= */
+const CHAT_NAME_KEY = 'ibrahim_tota_chat_name';
+const chatNameGate = document.getElementById('chat-name-gate');
+const chatWindow = document.getElementById('chat-window');
+const chatMessagesEl = document.getElementById('chat-messages');
+const chatEmptyNote = document.getElementById('chat-empty-note');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+const chatWhoami = document.getElementById('chat-whoami');
+const chatStatusEl = document.getElementById('chat-status');
+
+let myChatName = localStorage.getItem(CHAT_NAME_KEY);
+let lastRenderedCount = -1;
+
+function otherChatName(){ return myChatName === 'Ibrahim' ? 'Tota' : 'Ibrahim'; }
+function labelOf(name){ return name === 'Ibrahim' ? 'إبراهيم' : 'توتا'; }
+
+function showChatWindow(){
+  chatNameGate.classList.add('hidden');
+  chatWindow.classList.remove('hidden');
+  chatWhoami.textContent = `بتكتب كـ ${labelOf(myChatName)}`;
+  sendHeartbeat(false);
+  pollAll();
+  setInterval(()=>{ if(document.activeElement !== chatInput) sendHeartbeat(false); }, 6000);
+}
+
+document.querySelectorAll('.chat-name-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    myChatName = btn.dataset.name;
+    localStorage.setItem(CHAT_NAME_KEY, myChatName);
+    showChatWindow();
+  });
+});
+if(myChatName){ showChatWindow(); }
+
+const REACTION_EMOJIS = ['❤️','😂','😮','😢','👍'];
+
+function renderChatMessages(messages, presence){
+  chatMessagesEl.innerHTML = '';
+  chatEmptyNote.style.display = messages.length ? 'none' : 'block';
+  const other = (presence && presence[otherChatName()]) || {};
+  messages.forEach(m=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'chat-bubble-wrap ' + (m.sender === myChatName ? 'mine' : 'theirs');
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = `<span class="sender">${labelOf(m.sender)}</span>`;
+    bubble.appendChild(document.createTextNode(m.text));
+    if(m.sender === myChatName){
+      const seen = other.ts && other.ts > m.time;
+      const tick = document.createElement('span');
+      tick.className = 'seen-tick';
+      tick.textContent = seen ? '✓✓ اتشافت' : '✓ اتبعتت';
+      bubble.appendChild(tick);
     }
-  }catch(e){ /* silent — will retry next interval */ }
-}, 4000);
+
+    const badges = document.createElement('div');
+    badges.className = 'reaction-badges';
+    const reactions = m.reactions || {};
+    Object.values(reactions).forEach(emoji=>{ badges.textContent += emoji; });
+
+    const picker = document.createElement('div');
+    picker.className = 'reaction-picker hidden';
+    REACTION_EMOJIS.forEach(emoji=>{
+      const span = document.createElement('span');
+      span.textContent = emoji;
+      span.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        toggleReaction(m.time, emoji);
+        picker.classList.add('hidden');
+      });
+      picker.appendChild(span);
+    });
+
+    bubble.addEventListener('click', ()=>{ picker.classList.toggle('hidden'); });
+
+    wrap.appendChild(bubble);
+    wrap.appendChild(badges);
+    wrap.appendChild(picker);
+    chatMessagesEl.appendChild(wrap);
+  });
+  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+}
+
+async function toggleReaction(messageTime, emoji){
+  if(!myChatName) return;
+  try{
+    const record = await fetchBinRecord();
+    const messages = record.messages || [];
+    const msg = messages.find(m=>m.time === messageTime);
+    if(!msg) return;
+    if(!msg.reactions) msg.reactions = {};
+    if(msg.reactions[myChatName] === emoji){
+      delete msg.reactions[myChatName]; // tap same emoji again to remove
+    } else {
+      msg.reactions[myChatName] = emoji;
+    }
+    await putBinRecord({ ...record, messages });
+    renderChatMessages(messages, record.presence);
+    lastRenderedCount = messages.length;
+  }catch(e){ /* silent */ }
+}
+
+function updateStatusLine(presence){
+  const other = (presence && presence[otherChatName()]) || {};
+  const now = Date.now();
+  const online = other.ts && (now - other.ts < 8000);
+  const typing = other.typingTs && (now - other.typingTs < 3000);
+  chatStatusEl.classList.toggle('online', !!online);
+  if(typing) chatStatusEl.textContent = `${labelOf(otherChatName())} بيكتب دلوقتي...`;
+  else if(online) chatStatusEl.textContent = `${labelOf(otherChatName())} متصل/ة دلوقتي 🟢`;
+  else chatStatusEl.textContent = `${labelOf(otherChatName())} مش متصل/ة دلوقتي`;
+}
+
+/* single combined poll: updates reply box + chat messages + presence status */
+async function pollAll(){
+  try{
+    const record = await fetchBinRecord();
+    if(document.activeElement !== replyBox){
+      const latestReply = record.reply || '';
+      if(latestReply !== replyBox.value) replyBox.value = latestReply;
+    }
+    if(myChatName){
+      const messages = record.messages || [];
+      if(messages.length !== lastRenderedCount){
+        renderChatMessages(messages, record.presence);
+        lastRenderedCount = messages.length;
+      } else {
+        updateStatusLine(record.presence);
+      }
+    }
+  }catch(e){ /* silent — retries next poll */ }
+}
+setInterval(pollAll, 3000);
+
+/* presence heartbeat: marks "online", carries typing state, and doubles as "seen" marker */
+let lastHeartbeatTs = 0;
+async function sendHeartbeat(isTyping){
+  if(!myChatName) return;
+  const now = Date.now();
+  if(!isTyping && now - lastHeartbeatTs < 5000) return; // throttle idle heartbeats
+  lastHeartbeatTs = now;
+  try{
+    const record = await fetchBinRecord();
+    const presence = record.presence || {};
+    const prevTypingTs = (presence[myChatName] && presence[myChatName].typingTs) || 0;
+    presence[myChatName] = { ts: now, typingTs: isTyping ? now : prevTypingTs };
+    await putBinRecord({ ...record, presence });
+  }catch(e){ /* silent */ }
+}
+
+let typingThrottled = false;
+chatInput.addEventListener('input', ()=>{
+  if(!typingThrottled){
+    typingThrottled = true;
+    sendHeartbeat(true);
+    setTimeout(()=>{ typingThrottled = false; }, 2000);
+  }
+});
+
+async function sendChatMessage(){
+  const text = chatInput.value.trim();
+  if(!text || !myChatName) return;
+  chatInput.value = '';
+  try{
+    const record = await fetchBinRecord();
+    const messages = record.messages || [];
+    messages.push({ sender: myChatName, text, time: Date.now() });
+    const presence = record.presence || {};
+    presence[myChatName] = { ts: Date.now(), typingTs: 0 };
+    await putBinRecord({ ...record, messages, presence });
+    renderChatMessages(messages, presence);
+    lastRenderedCount = messages.length;
+  }catch(e){ /* if it fails, text stays cleared but user can retype */ }
+}
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') sendChatMessage(); });
 </script>
 </body>
 </html>
