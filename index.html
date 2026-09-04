@@ -369,7 +369,7 @@
     grid-template-columns:repeat(2,1fr);
     gap:14px;
   }
-  .flip-card{aspect-ratio:3/4; perspective:1000px; cursor:pointer;}
+  .flip-card{aspect-ratio:3/4; perspective:1000px; cursor:pointer; direction:ltr;}
   .flip-inner{
     position:relative; width:100%; height:100%;
     transition:transform .6s;
@@ -379,6 +379,8 @@
   .flip-front, .flip-back{
     position:absolute; inset:0;
     backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    direction:rtl;
     border-radius:16px;
     border:1px solid var(--glass-border);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -950,21 +952,45 @@ adminDoneBtn.addEventListener('click', ()=>{
   enterSite();
 });
 
-/* ================= her reply box ================= */
+/* ================= her reply box (shared via JSONBin) ================= */
 const replyBox = document.getElementById('reply-box');
 const saveReplyBtn = document.getElementById('save-reply-btn');
 const replySavedNote = document.getElementById('reply-saved-note');
-const REPLY_KEY = 'ibrahim_tota_reply';
 
-function loadReply(){
-  const saved = localStorage.getItem(REPLY_KEY);
-  if(saved){ replyBox.value = saved; }
+const BIN_ID = '6a9b0f3bf5f4af5e296b2dfb';
+const BIN_KEY = '$2a$10$kIdsr1b7VkCwH/JZQ/BfyOfytkx.yCI72OkRGSEW4qpwFxcegYGfq';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+async function loadReply(){
+  try{
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': BIN_KEY }
+    });
+    const data = await res.json();
+    replyBox.value = (data.record && data.record.reply) || '';
+  }catch(e){
+    console.error('couldn\'t load reply', e);
+  }
 }
-saveReplyBtn.addEventListener('click', ()=>{
-  localStorage.setItem(REPLY_KEY, replyBox.value);
-  replySavedNote.textContent = 'اتحفظ يا قمر 💌';
+
+async function saveReply(){
+  replySavedNote.textContent = 'بتتحفظ...';
+  try{
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': BIN_KEY
+      },
+      body: JSON.stringify({ reply: replyBox.value })
+    });
+    replySavedNote.textContent = 'اتحفظ يا قمر 💌';
+  }catch(e){
+    replySavedNote.textContent = 'حصلت مشكلة، جربي تاني';
+  }
   setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500);
-});
+}
+saveReplyBtn.addEventListener('click', saveReply);
 loadReply();
 </script>
 </body>
