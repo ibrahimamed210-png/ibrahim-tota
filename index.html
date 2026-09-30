@@ -38,6 +38,19 @@
 
   /* floating hearts rising through the background */
   .hearts{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
+  .stars{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .stars span{
+    position:absolute;
+    width:2.5px; height:2.5px;
+    border-radius:50%;
+    background:#fff;
+    opacity:.5;
+    animation:twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.15;}
+    50%{opacity:.75;}
+  }
   .hearts span{
     position:absolute; bottom:-10%; font-size:16px;
     animation:rise linear infinite;
@@ -121,6 +134,20 @@
     cursor:pointer;
     transition:transform .2s, box-shadow .2s;
     box-shadow:0 10px 26px rgba(255,95,150,.3);
+    position:relative;
+    overflow:hidden;
+  }
+  #unlock-btn::after{
+    content:'';
+    position:absolute; top:0; bottom:0; left:-60%;
+    width:40%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    animation:btnShimmer 2.6s ease-in-out infinite;
+  }
+  @keyframes btnShimmer{
+    0%{left:-60%;}
+    45%{left:130%;}
+    100%{left:130%;}
   }
   #unlock-btn:hover{transform:translateY(-2px); box-shadow:0 14px 32px rgba(255,95,150,.4);}
   #lock-error{
@@ -255,9 +282,15 @@
     font-weight:700;
     font-size:clamp(36px,10vw,52px);
     letter-spacing:.5px;
-    background:linear-gradient(100deg,#ffd3e2,var(--grad-a) 45%,var(--grad-b));
+    background:linear-gradient(100deg,#ffd3e2,var(--grad-a) 45%,var(--grad-b) 65%,#ffd3e2 85%);
+    background-size:250% 100%;
     -webkit-background-clip:text; background-clip:text; color:transparent;
     line-height:1.15;
+    animation:titleShimmer 2.8s ease-out .3s 1;
+  }
+  @keyframes titleShimmer{
+    0%{background-position:100% 0;}
+    100%{background-position:0% 0;}
   }
   .hero-line{
     margin-top:10px;
@@ -275,12 +308,22 @@
     background:var(--glass);
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
-    border:1px solid var(--glass-border);
+    border:1px solid rgba(255,106,156,.35);
     border-radius:24px;
     padding:30px 24px;
+    box-shadow:0 0 0 1px rgba(168,117,255,.12), 0 0 26px rgba(255,106,156,.16);
   }
 
   section{margin-bottom:30px;}
+  section.reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  section.reveal.in-view{
+    opacity:1;
+    transform:translateY(0);
+  }
   section h2{
     font-weight:800;
     font-size:20px;
@@ -396,6 +439,45 @@
     text-align:center; line-height:1.45;
   }
   .flip-heart-icon{width:22px; height:22px; flex:0 0 auto;}
+
+  /* ---- timeline ---- */
+  .timeline{
+    position:relative;
+    padding-right:32px;
+  }
+  .timeline::before{
+    content:'';
+    position:absolute;
+    right:9px; top:6px; bottom:6px;
+    width:2px;
+    background:linear-gradient(180deg,var(--grad-a),var(--grad-b));
+  }
+  .timeline-item{
+    position:relative;
+    padding-bottom:26px;
+  }
+  .timeline-item:last-child{padding-bottom:0;}
+  .timeline-dot{
+    position:absolute;
+    right:-32px; top:2px;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+    box-shadow:0 0 0 4px rgba(255,106,156,.18);
+  }
+  .timeline-date{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--grad-c);
+    margin-bottom:3px;
+  }
+  .timeline-title{
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--text-hi);
+  }
 
   /* ---- letter ---- */
   .letter{
@@ -607,12 +689,16 @@
     aspect-ratio:1/1;
     border-radius:16px;
     overflow:hidden;
-    border:1px solid var(--glass-border);
+    border:2.5px solid transparent;
+    background:
+      linear-gradient(var(--bg-2),var(--bg-2)) padding-box,
+      linear-gradient(135deg,var(--grad-a),var(--grad-b),var(--grad-c)) border-box;
+    box-shadow:0 4px 16px rgba(0,0,0,.25);
     transition:transform .25s ease;
   }
   .pic-wrap:hover{transform:scale(1.04);}
   .pic-wrap img,
-  .pic-wrap video{width:100%; height:100%; object-fit:cover; display:block;}
+  .pic-wrap video{width:100%; height:100%; object-fit:cover; display:block; border-radius:13px;}
   .pic-wrap .del-btn{
     position:absolute; top:6px; left:6px;
     width:24px; height:24px;
@@ -707,6 +793,7 @@
 </head>
 <body>
 
+<div class="stars" id="stars" aria-hidden="true"></div>
 <div class="hearts" id="hearts" aria-hidden="true"></div>
 
 <!-- ================= PASSWORD SCREEN ================= -->
@@ -750,7 +837,7 @@
     <div class="divider"></div>
   </header>
 
-  <section id="counter-section">
+  <section class="reveal" id="counter-section">
     <h2><span class="dot">·</span> إحنا مع بعض بقالنا <span class="dot">·</span></h2>
     <div class="glass-card">
       <div class="counter-grid">
@@ -763,7 +850,7 @@
     </div>
   </section>
 
-  <section id="stop-section" style="margin-top:44px;">
+  <section class="reveal" id="stop-section" style="margin-top:44px;">
     <div class="glass-card">
       <div class="stop-line">😂اقفي هنا شوية متجريش</div>
       <div class="mini-words">
@@ -786,7 +873,7 @@
     </div>
   </section>
 
-  <section id="cards-section" style="margin-top:26px;">
+  <section class="reveal" id="cards-section" style="margin-top:26px;">
     <div class="glass-card">
       <div class="cards-line">❤😉 دوسي علي الكروت</div>
       <div class="flip-cards-grid">
@@ -830,7 +917,30 @@
     </div>
   </section>
 
-  <section id="letter-section">
+  <section class="reveal" id="timeline-section" style="margin-top:26px;">
+    <h2><span class="dot">·</span> محطاتنا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot">💬</div>
+          <div class="timeline-date">3 أغسطس</div>
+          <div class="timeline-title">أول مرة اتكلمنا</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">📍</div>
+          <div class="timeline-date">11 أغسطس</div>
+          <div class="timeline-title">أول مرة اتقابلنا</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">❤️</div>
+          <div class="timeline-date">15 أغسطس</div>
+          <div class="timeline-title">أول مرة قلتلك بحبك</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal" id="letter-section">
     <h2><span class="dot">·</span> كلمة من قلبي <span class="dot">·</span></h2>
     <div class="glass-card">
       <div class="letter" id="letter-text">توتا يا روحي،
@@ -852,7 +962,7 @@
     </div>
   </section>
 
-  <section id="reply-section">
+  <section class="reveal" id="reply-section">
     <h2><span class="dot">·</span> دلوقتي دورك يا توتا <span class="dot">·</span></h2>
     <div class="glass-card">
       <textarea id="reply-box" placeholder="اكتبيلي اللي في قلبك يا توتا... 💌" rows="5"></textarea>
@@ -861,7 +971,7 @@
     </div>
   </section>
 
-  <section id="chat-corner">
+  <section class="reveal" id="chat-corner">
     <h2><span class="dot">·</span> ركن الشات بتاعنا <span class="dot">·</span></h2>
     <div class="glass-card">
       <div id="chat-name-gate">
@@ -884,7 +994,7 @@
     </div>
   </section>
 
-  <section id="gallery-section">
+  <section class="reveal" id="gallery-section">
     <h2><span class="dot">·</span> لحظاتنا <span class="dot">·</span></h2>
     <div class="gallery-grid" id="gallery-grid"></div>
     <div class="empty-note" id="empty-note">لسه مفيش صور أو فيديوهات هنا</div>
@@ -902,6 +1012,36 @@
 </div>
 
 <script>
+/* ================= reveal sections on scroll (one-time, lightweight) ================= */
+(function(){
+  const targets = document.querySelectorAll('section.reveal');
+  if(!('IntersectionObserver' in window)){
+    targets.forEach(t=>t.classList.add('in-view'));
+    return;
+  }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  targets.forEach(t=>io.observe(t));
+})();
+
+/* ================= static twinkling stars (cheap, low count) ================= */
+(function(){
+  const wrap = document.getElementById('stars');
+  for(let i=0;i<18;i++){
+    const s = document.createElement('span');
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3.5)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
 /* ================= floating hearts (single ambient effect) ================= */
 (function(){
   const wrap = document.getElementById('hearts');
@@ -955,7 +1095,7 @@ pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
 
 /* ================= counter ================= */
 // تاريخ البداية متخزن هنا من غير ما يتعرض في الصفحة
-const START_TIME = new Date(2026, 7, 9, 3, 6, 0).getTime(); // شهر 7 = أغسطس (index من صفر)
+const START_TIME = new Date(2026, 7, 3, 3, 6, 0).getTime(); // شهر 7 = أغسطس (index من صفر)
 
 function startCounter(){
   updateCounter();
