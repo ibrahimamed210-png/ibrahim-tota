@@ -195,7 +195,7 @@
     font-size:13.5px;
     margin-bottom:22px;
   }
-  #admin-upload-label{
+  #admin-upload-label, .admin-upload-label{
     display:block;
     text-align:center;
     padding:16px;
@@ -790,6 +790,8 @@
   }
   #song-upload-btn:hover{background:rgba(255,255,255,.06); color:var(--text-hi);}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -804,9 +806,9 @@
       <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
     </svg>
     <div class="lock-title">Ibrahim &amp; Tota</div>
-    <div class="lock-sub">جاهزة يا روحي؟ 💕</div>
+    <div class="lock-sub">جاهزه للمفاجأه يا روح قلبي 💕</div>
     <input type="password" id="password-input" placeholder="l o v e" />
-    <button id="unlock-btn">افتحي 💗</button>
+    <button id="unlock-btn">دوسي يا روحي 💗</button>
     <div id="lock-error"></div>
   </div>
 </div>
@@ -815,16 +817,17 @@
 <div id="admin-panel" class="hidden">
   <div class="admin-box">
     <div class="admin-title">لوحة التحكم</div>
-    <div class="admin-sub">ضيفي أو احذفي صور وفيديوهات "لحظاتنا"</div>
+    <div class="admin-sub">صور ترفعيها هنا تظهر فورًا لأي حد يفتح الموقع</div>
 
-    <label id="admin-upload-label" for="admin-photo-input">📷 دوسي هنا لإضافة صور أو فيديوهات</label>
-    <input type="file" id="admin-photo-input" accept="image/*,video/*" multiple />
+    <label id="admin-upload-label" for="admin-photo-input">📷 دوسي هنا لإضافة صورة</label>
+    <input type="file" id="admin-photo-input" accept="image/*" multiple />
+    <div id="admin-upload-note" style="color:var(--text-dim); font-size:12.5px; text-align:center; margin-top:4px; min-height:16px;"></div>
 
-    <div class="admin-grid" id="admin-grid"></div>
-    <div id="admin-empty-note">لسه مفيش صور أو فيديوهات مضافة</div>
+    <a id="admin-upload-link" class="admin-upload-label" href="#" target="_blank" style="text-decoration:none; display:block; margin-top:16px; font-size:13.5px;">
+      🎬 عايز ترفع فيديو؟ دوسي هنا (بيرفع على GitHub)
+    </a>
 
-    <button id="admin-done-btn">خلصت، وريني الموقع 💗</button>
-    <div id="admin-note"></div>
+    <button id="admin-done-btn" style="margin-top:18px;">خلصت، وريني الموقع 💗</button>
   </div>
 </div>
 
@@ -833,12 +836,12 @@
 
   <header class="hero">
     <div class="names">Ibrahim <span style="color:var(--grad-c); font-size:.7em;">&amp;</span> Tota</div>
-    <div class="hero-line">كل تفصيلة هنا ليكي يا توتا</div>
+    <div class="hero-line">كل تفصيلة هنا ليكي يا نور عيني </div>
     <div class="divider"></div>
   </header>
 
   <section class="reveal" id="counter-section">
-    <h2><span class="dot">·</span> إحنا مع بعض بقالنا <span class="dot">·</span></h2>
+    <h2><span class="dot">·</span> العداد ده مش هيقف ابداا <span class="dot">·</span></h2>
     <div class="glass-card">
       <div class="counter-grid">
         <div class="counter-box"><div class="counter-num" id="c-days">0</div><div class="counter-label">يوم</div></div>
@@ -846,7 +849,7 @@
         <div class="counter-box"><div class="counter-num" id="c-mins">0</div><div class="counter-label">دقيقة</div></div>
         <div class="counter-box"><div class="counter-num" id="c-secs">0</div><div class="counter-label">ثانية</div></div>
       </div>
-      <div class="counter-note">وكل ثانية فيهم بتساوي الدنيا 🌷</div>
+      <div class="counter-note">وكل ثانية فيهم بيزيد حبي ليكي اكتر من الثانيه اللي قبلها  🌷</div>
     </div>
   </section>
 
@@ -963,9 +966,9 @@
   </section>
 
   <section class="reveal" id="reply-section">
-    <h2><span class="dot">·</span> دلوقتي دورك يا توتا <span class="dot">·</span></h2>
+    <h2><span class="dot">·</span> دلوقتي دورك يا قلبيي <span class="dot">·</span></h2>
     <div class="glass-card">
-      <textarea id="reply-box" placeholder="اكتبيلي اللي في قلبك يا توتا... 💌" rows="5"></textarea>
+      <textarea id="reply-box" placeholder="اكتبيلي اللي انتي عايزه تكتبيه يا روحي ... 💌" rows="5"></textarea>
       <button id="save-reply-btn">احفظي 💗</button>
       <div id="reply-saved-note"></div>
     </div>
@@ -1000,7 +1003,7 @@
     <div class="empty-note" id="empty-note">لسه مفيش صور أو فيديوهات هنا</div>
   </section>
 
-  <footer class="credit">بحبك من كل قلبي 💗</footer>
+  <footer class="credit">بعشقك يا عمريي 💗</footer>
 </div>
 
 <!-- ================= MUSIC PLAYER ================= -->
@@ -1059,7 +1062,7 @@
 
 /* ================= password lock ================= */
 const CORRECT_PASSWORD = "love";
-const ADMIN_PASSWORD = "admin2026";
+const ADMIN_PASSWORD = "admin";
 const lockScreen = document.getElementById('lock-screen');
 const pwInput = document.getElementById('password-input');
 const unlockBtn = document.getElementById('unlock-btn');
@@ -1084,7 +1087,7 @@ function tryUnlock(){
     enterSite();
   } else if(val === ADMIN_PASSWORD){
     lockScreen.classList.add('hidden');
-    renderAdminGrid();
+    adminPanel.classList.remove('hidden');
   } else {
     lockError.textContent = "الباسورد غلط، جربي تاني 🌷";
     pwInput.value = '';
@@ -1146,160 +1149,140 @@ document.querySelectorAll('.flip-card').forEach(card=>{
   card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); });
 });
 
-/* ================= gallery: photos & videos (managed from admin panel) ================= */
+/* ================= Firebase setup (real database, real-time) ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyBRcrHYtBjnycY1tmAjz_KWGX9j9mNb4dg",
+  authDomain: "ibrahim-tota.firebaseapp.com",
+  databaseURL: "https://ibrahim-tota-default-rtdb.firebaseio.com",
+  projectId: "ibrahim-tota",
+  storageBucket: "ibrahim-tota.firebasestorage.app",
+  messagingSenderId: "545374194132",
+  appId: "1:545374194132:web:d0813ec29889498588ee41"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ================= gallery: images uploaded directly from the site (stored in Firebase),
+   videos uploaded via GitHub (too large for the free database) ================= */
 const galleryGrid = document.getElementById('gallery-grid');
 const emptyNote = document.getElementById('empty-note');
-const GALLERY_KEY = 'ibrahim_tota_gallery';
+const GH_OWNER = 'ibrahimamed210-png';
+const GH_REPO = 'ibrahim-tota';
+const GH_FOLDER = 'gallery';
+const VIDEO_EXT = ['mp4','mov','webm','m4v'];
+function isVideoFile(name){ return VIDEO_EXT.includes((name||'').split('.').pop().toLowerCase()); }
 
-function loadGalleryItems(){
-  try{
-    const raw = localStorage.getItem(GALLERY_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
-}
-function saveGalleryItems(items){
-  try{
-    localStorage.setItem(GALLERY_KEY, JSON.stringify(items));
-    return true;
-  }catch(e){ return false; }
-}
-
-function renderGallery(){
-  const items = loadGalleryItems();
+function renderGallery(imageItems, videoFiles){
   galleryGrid.innerHTML = '';
-  emptyNote.style.display = items.length ? 'none' : 'block';
-  items.forEach(item=>{
+  const total = imageItems.length + videoFiles.length;
+  emptyNote.style.display = total ? 'none' : 'block';
+  imageItems.forEach(item=>{
     const wrap = document.createElement('div');
     wrap.className = 'pic-wrap';
-    let media;
-    if(item.type === 'video'){
-      media = document.createElement('video');
-      media.src = item.src;
-      media.controls = true;
-      media.playsInline = true;
-    } else {
-      media = document.createElement('img');
-      media.src = item.src;
-      media.alt = '';
-    }
-    wrap.appendChild(media);
+    const img = document.createElement('img');
+    img.src = item.src;
+    img.alt = '';
+    wrap.appendChild(img);
+    galleryGrid.appendChild(wrap);
+  });
+  videoFiles.forEach(file=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'pic-wrap';
+    const vid = document.createElement('video');
+    vid.src = file.download_url;
+    vid.controls = true;
+    vid.playsInline = true;
+    wrap.appendChild(vid);
     galleryGrid.appendChild(wrap);
   });
 }
-renderGallery();
 
-/* ================= admin panel: add/remove gallery media ================= */
-const adminGrid = document.getElementById('admin-grid');
-const adminEmptyNote = document.getElementById('admin-empty-note');
-const adminPhotoInput = document.getElementById('admin-photo-input');
-const adminDoneBtn = document.getElementById('admin-done-btn');
-const adminNote = document.getElementById('admin-note');
-
-function renderAdminGrid(){
-  const items = loadGalleryItems();
-  adminGrid.innerHTML = '';
-  adminEmptyNote.style.display = items.length ? 'none' : 'block';
-  items.forEach((item, idx)=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'admin-pic-wrap';
-    let media;
-    if(item.type === 'video'){
-      media = document.createElement('video');
-      media.src = item.src;
-      media.muted = true;
-    } else {
-      media = document.createElement('img');
-      media.src = item.src;
-      media.alt = '';
+let lastImageItems = [];
+let lastVideoFiles = [];
+db.ref('site/gallery').on('value', snap=>{
+  const val = snap.val() || {};
+  lastImageItems = Object.values(val);
+  renderGallery(lastImageItems, lastVideoFiles);
+});
+(async function loadVideosFromGithub(){
+  try{
+    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FOLDER}`);
+    if(res.ok){
+      const files = await res.json();
+      lastVideoFiles = files.filter(f=>isVideoFile(f.name));
+      renderGallery(lastImageItems, lastVideoFiles);
     }
-    const delBtn = document.createElement('button');
-    delBtn.className = 'del-btn';
-    delBtn.textContent = '✕';
-    delBtn.addEventListener('click', ()=>{
-      const current = loadGalleryItems();
-      current.splice(idx,1);
-      saveGalleryItems(current);
-      renderAdminGrid();
-    });
-    wrap.appendChild(media);
-    wrap.appendChild(delBtn);
-    adminGrid.appendChild(wrap);
-  });
-  adminPanel.classList.remove('hidden');
+  }catch(e){ /* silent — images still show fine */ }
+})();
+
+/* ================= admin panel: upload images (resized) straight to Firebase ================= */
+const adminPhotoInput = document.getElementById('admin-photo-input');
+const adminUploadNote = document.getElementById('admin-upload-note');
+const adminDoneBtn = document.getElementById('admin-done-btn');
+const adminUploadLink = document.getElementById('admin-upload-link');
+if(adminUploadLink){
+  adminUploadLink.href = `https://github.com/${GH_OWNER}/${GH_REPO}/upload/main/${GH_FOLDER}`;
 }
 
-adminPhotoInput.addEventListener('change', (e)=>{
-  const files = Array.from(e.target.files || []);
-  if(!files.length) return;
-  let remaining = files.length;
-  const current = loadGalleryItems();
-  files.forEach(file=>{
-    const type = file.type.startsWith('video') ? 'video' : 'image';
+function resizeImageFile(file, maxDim){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
     const reader = new FileReader();
     reader.onload = ()=>{
-      current.push({ src: reader.result, type });
-      remaining--;
-      if(remaining === 0){
-        const ok = saveGalleryItems(current);
-        adminNote.textContent = ok ? 'اتضافوا 💗' : 'الملفات كبيرة قوي، جربي صور أقل حجمًا';
-        renderAdminGrid();
-      }
+      img.onload = ()=>{
+        let { width, height } = img;
+        if(width > height && width > maxDim){ height = height*(maxDim/width); width = maxDim; }
+        else if(height > maxDim){ width = width*(maxDim/height); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
     };
+    reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+adminPhotoInput.addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  adminUploadNote.textContent = 'بترفع...';
+  try{
+    for(const file of files){
+      const dataUrl = await resizeImageFile(file, 1000);
+      await db.ref('site/gallery').push({ src: dataUrl });
+    }
+    adminUploadNote.textContent = 'اتضافت 💗';
+  }catch(e){
+    adminUploadNote.textContent = 'حصلت مشكلة، جربي تاني';
+  }
+  setTimeout(()=>{ adminUploadNote.textContent = ''; }, 2500);
   adminPhotoInput.value = '';
 });
 
-adminDoneBtn.addEventListener('click', ()=>{
-  renderGallery();
-  enterSite();
-});
-
-/* ================= shared JSONBin setup ================= */
-const BIN_ID = '6a9b0f3bf5f4af5e296b2dfb';
-const BIN_KEY = '$2a$10$kIdsr1b7VkCwH/JZQ/BfyOfytkx.yCI72OkRGSEW4qpwFxcegYGfq';
-const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-
-async function fetchBinRecord(){
-  const res = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': BIN_KEY } });
-  const data = await res.json();
-  return data.record || {};
-}
-async function putBinRecord(record){
-  await fetch(BIN_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
-    body: JSON.stringify(record)
-  });
-}
+adminDoneBtn.addEventListener('click', ()=>{ enterSite(); });
 
 /* ================= her reply box ================= */
 const replyBox = document.getElementById('reply-box');
 const saveReplyBtn = document.getElementById('save-reply-btn');
 const replySavedNote = document.getElementById('reply-saved-note');
+const replyRef = db.ref('site/reply');
 
-async function loadReply(){
-  try{
-    const record = await fetchBinRecord();
-    replyBox.value = record.reply || '';
-  }catch(e){ console.error("couldn't load reply", e); }
-}
-
-async function saveReply(){
+replyRef.on('value', snap=>{
+  if(document.activeElement !== replyBox){ replyBox.value = snap.val() || ''; }
+});
+saveReplyBtn.addEventListener('click', ()=>{
   replySavedNote.textContent = 'بتتحفظ...';
-  try{
-    const record = await fetchBinRecord();
-    await putBinRecord({ ...record, reply: replyBox.value });
-    replySavedNote.textContent = 'اتحفظ يا قمر 💌';
-  }catch(e){
-    replySavedNote.textContent = 'حصلت مشكلة، جربي تاني';
-  }
-  setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500);
-}
-saveReplyBtn.addEventListener('click', saveReply);
-loadReply();
+  replyRef.set(replyBox.value)
+    .then(()=>{ replySavedNote.textContent = 'اتحفظ يا قمر 💌'; })
+    .catch(()=>{ replySavedNote.textContent = 'حصلت مشكلة، جربي تاني'; })
+    .finally(()=>{ setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500); });
+});
 
-/* ================= chat corner (messages + online/typing/seen) ================= */
+/* ================= chat corner (messages + online/typing/seen + reactions) ================= */
 const CHAT_NAME_KEY = 'ibrahim_tota_chat_name';
 const chatNameGate = document.getElementById('chat-name-gate');
 const chatWindow = document.getElementById('chat-window');
@@ -1309,37 +1292,18 @@ const chatInput = document.getElementById('chat-input');
 const chatSendBtn = document.getElementById('chat-send-btn');
 const chatWhoami = document.getElementById('chat-whoami');
 const chatStatusEl = document.getElementById('chat-status');
+const REACTION_EMOJIS = ['❤️','😂','😮','😢','👍'];
 
 let myChatName = localStorage.getItem(CHAT_NAME_KEY);
-let lastRenderedCount = -1;
+let latestPresence = {};
 
 function otherChatName(){ return myChatName === 'Ibrahim' ? 'Tota' : 'Ibrahim'; }
 function labelOf(name){ return name === 'Ibrahim' ? 'إبراهيم' : 'توتا'; }
 
-function showChatWindow(){
-  chatNameGate.classList.add('hidden');
-  chatWindow.classList.remove('hidden');
-  chatWhoami.textContent = `بتكتب كـ ${labelOf(myChatName)}`;
-  sendHeartbeat(false);
-  pollAll();
-  setInterval(()=>{ if(document.activeElement !== chatInput) sendHeartbeat(false); }, 6000);
-}
-
-document.querySelectorAll('.chat-name-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    myChatName = btn.dataset.name;
-    localStorage.setItem(CHAT_NAME_KEY, myChatName);
-    showChatWindow();
-  });
-});
-if(myChatName){ showChatWindow(); }
-
-const REACTION_EMOJIS = ['❤️','😂','😮','😢','👍'];
-
-function renderChatMessages(messages, presence){
+function renderChatMessages(messages){
   chatMessagesEl.innerHTML = '';
   chatEmptyNote.style.display = messages.length ? 'none' : 'block';
-  const other = (presence && presence[otherChatName()]) || {};
+  const other = latestPresence[otherChatName()] || {};
   messages.forEach(m=>{
     const wrap = document.createElement('div');
     wrap.className = 'chat-bubble-wrap ' + (m.sender === myChatName ? 'mine' : 'theirs');
@@ -1368,7 +1332,7 @@ function renderChatMessages(messages, presence){
       span.textContent = emoji;
       span.addEventListener('click', (ev)=>{
         ev.stopPropagation();
-        toggleReaction(m.time, emoji);
+        toggleReaction(m.id, emoji, reactions);
         picker.classList.add('hidden');
       });
       picker.appendChild(span);
@@ -1384,27 +1348,15 @@ function renderChatMessages(messages, presence){
   chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
 }
 
-async function toggleReaction(messageTime, emoji){
+function toggleReaction(messageId, emoji, currentReactions){
   if(!myChatName) return;
-  try{
-    const record = await fetchBinRecord();
-    const messages = record.messages || [];
-    const msg = messages.find(m=>m.time === messageTime);
-    if(!msg) return;
-    if(!msg.reactions) msg.reactions = {};
-    if(msg.reactions[myChatName] === emoji){
-      delete msg.reactions[myChatName]; // tap same emoji again to remove
-    } else {
-      msg.reactions[myChatName] = emoji;
-    }
-    await putBinRecord({ ...record, messages });
-    renderChatMessages(messages, record.presence);
-    lastRenderedCount = messages.length;
-  }catch(e){ /* silent */ }
+  const ref = db.ref(`site/messages/${messageId}/reactions/${myChatName}`);
+  if(currentReactions[myChatName] === emoji){ ref.remove(); }
+  else{ ref.set(emoji); }
 }
 
-function updateStatusLine(presence){
-  const other = (presence && presence[otherChatName()]) || {};
+function updateStatusLine(){
+  const other = latestPresence[otherChatName()] || {};
   const now = Date.now();
   const online = other.ts && (now - other.ts < 8000);
   const typing = other.typingTs && (now - other.typingTs < 3000);
@@ -1414,41 +1366,51 @@ function updateStatusLine(presence){
   else chatStatusEl.textContent = `${labelOf(otherChatName())} مش متصل/ة دلوقتي`;
 }
 
-/* single combined poll: updates reply box + chat messages + presence status */
-async function pollAll(){
-  try{
-    const record = await fetchBinRecord();
-    if(document.activeElement !== replyBox){
-      const latestReply = record.reply || '';
-      if(latestReply !== replyBox.value) replyBox.value = latestReply;
-    }
-    if(myChatName){
-      const messages = record.messages || [];
-      if(messages.length !== lastRenderedCount){
-        renderChatMessages(messages, record.presence);
-        lastRenderedCount = messages.length;
-      } else {
-        updateStatusLine(record.presence);
-      }
-    }
-  }catch(e){ /* silent — retries next poll */ }
-}
-setInterval(pollAll, 3000);
+let lastMessages = [];
+function showChatWindow(){
+  chatNameGate.classList.add('hidden');
+  chatWindow.classList.remove('hidden');
+  chatWhoami.textContent = `بتكتب كـ ${labelOf(myChatName)}`;
 
-/* presence heartbeat: marks "online", carries typing state, and doubles as "seen" marker */
+  db.ref('site/messages').on('value', snap=>{
+    const val = snap.val() || {};
+    lastMessages = Object.entries(val)
+      .map(([id,m])=>({ id, ...m }))
+      .sort((a,b)=>a.time-b.time);
+    renderChatMessages(lastMessages);
+  });
+
+  db.ref('site/presence').on('value', snap=>{
+    latestPresence = snap.val() || {};
+    updateStatusLine();
+    renderChatMessages(lastMessages);
+  });
+
+  sendHeartbeat(false);
+  setInterval(()=>{ if(document.activeElement !== chatInput) sendHeartbeat(false); }, 6000);
+  setInterval(updateStatusLine, 3000); // keep online/typing text accurate even with no new events
+}
+
+document.querySelectorAll('.chat-name-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    myChatName = btn.dataset.name;
+    localStorage.setItem(CHAT_NAME_KEY, myChatName);
+    showChatWindow();
+  });
+});
+if(myChatName){ showChatWindow(); }
+
 let lastHeartbeatTs = 0;
-async function sendHeartbeat(isTyping){
+function sendHeartbeat(isTyping){
   if(!myChatName) return;
   const now = Date.now();
-  if(!isTyping && now - lastHeartbeatTs < 5000) return; // throttle idle heartbeats
+  if(!isTyping && now - lastHeartbeatTs < 5000) return;
   lastHeartbeatTs = now;
-  try{
-    const record = await fetchBinRecord();
-    const presence = record.presence || {};
-    const prevTypingTs = (presence[myChatName] && presence[myChatName].typingTs) || 0;
-    presence[myChatName] = { ts: now, typingTs: isTyping ? now : prevTypingTs };
-    await putBinRecord({ ...record, presence });
-  }catch(e){ /* silent */ }
+  const myRef = db.ref(`site/presence/${myChatName}`);
+  myRef.once('value').then(snap=>{
+    const prev = snap.val() || {};
+    myRef.set({ ts: now, typingTs: isTyping ? now : (prev.typingTs || 0) });
+  });
 }
 
 let typingThrottled = false;
@@ -1460,20 +1422,12 @@ chatInput.addEventListener('input', ()=>{
   }
 });
 
-async function sendChatMessage(){
+function sendChatMessage(){
   const text = chatInput.value.trim();
   if(!text || !myChatName) return;
   chatInput.value = '';
-  try{
-    const record = await fetchBinRecord();
-    const messages = record.messages || [];
-    messages.push({ sender: myChatName, text, time: Date.now() });
-    const presence = record.presence || {};
-    presence[myChatName] = { ts: Date.now(), typingTs: 0 };
-    await putBinRecord({ ...record, messages, presence });
-    renderChatMessages(messages, presence);
-    lastRenderedCount = messages.length;
-  }catch(e){ /* if it fails, text stays cleared but user can retype */ }
+  db.ref('site/messages').push({ sender: myChatName, text, time: Date.now() });
+  db.ref(`site/presence/${myChatName}`).update({ ts: Date.now(), typingTs: 0 });
 }
 chatSendBtn.addEventListener('click', sendChatMessage);
 chatInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') sendChatMessage(); });
