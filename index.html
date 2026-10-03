@@ -1235,10 +1235,15 @@ function openLightbox(src, isVideo){
 lightboxClose.addEventListener('click', ()=>{ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; });
 lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox){ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; } });
 
-function renderGallery(imageItems, videoFiles){
+/* video filenames can contain characters Firebase keys don't allow, so we
+   sanitize them into a safe key to store each video's hidden/bow state */
+function safeKey(name){ return name.replace(/[.#$\[\]\/]/g, '_'); }
+
+function renderGallery(imageItems, videoItems){
   galleryGrid.innerHTML = '';
   const visibleImages = imageItems.filter(item=>!item.hidden);
-  const total = visibleImages.length + videoFiles.length;
+  const visibleVideos = videoItems.filter(item=>!item.hidden);
+  const total = visibleImages.length + visibleVideos.length;
   emptyNote.style.display = total ? 'none' : 'block';
   visibleImages.forEach(item=>{
     const wrap = document.createElement('div');
@@ -1256,68 +1261,112 @@ function renderGallery(imageItems, videoFiles){
     wrap.addEventListener('click', ()=>openLightbox(item.src, false));
     galleryGrid.appendChild(wrap);
   });
-  videoFiles.forEach(file=>{
+  visibleVideos.forEach(item=>{
     const wrap = document.createElement('div');
     wrap.className = 'pic-wrap';
     const vid = document.createElement('video');
-    vid.src = file.download_url;
+    vid.src = item.download_url;
     vid.playsInline = true;
     wrap.appendChild(vid);
-    wrap.addEventListener('click', ()=>openLightbox(file.download_url, true));
+    if(item.bow){
+      const bow = document.createElement('div');
+      bow.className = 'pic-bow';
+      bow.textContent = '🎀';
+      wrap.appendChild(bow);
+    }
+    wrap.addEventListener('click', ()=>openLightbox(item.download_url, true));
     galleryGrid.appendChild(wrap);
   });
 }
 
 let lastImageEntries = []; // [{id, src, hidden, bow}]
-let lastVideoFiles = [];
+let lastVideoEntries = []; // [{key, name, download_url, hidden, bow}]
+let rawVideoFiles = [];    // raw GitHub file list, refreshed occasionally
+let videoSettings = {};    // from Firebase: { safeKey: {hidden, bow} }
+
+function mergeVideoEntries(){
+  lastVideoEntries = rawVideoFiles.map(f=>{
+    const key = safeKey(f.name);
+    const s = videoSettings[key] || {};
+    return { key, name: f.name, download_url: f.download_url, hidden: !!s.hidden, bow: !!s.bow };
+  });
+}
+
 db.ref('site/gallery').on('value', snap=>{
   const val = snap.val() || {};
   lastImageEntries = Object.entries(val).map(([id,item])=>({ id, ...item }));
-  renderGallery(lastImageEntries, lastVideoFiles);
+  renderGallery(lastImageEntries, lastVideoEntries);
   renderAdminGrid();
 });
 
-/* ================= admin: preview uploaded photos, toggle hide / bow per photo ================= */
+db.ref('site/videoSettings').on('value', snap=>{
+  videoSettings = snap.val() || {};
+  mergeVideoEntries();
+  renderGallery(lastImageEntries, lastVideoEntries);
+  renderAdminGrid();
+});
+
+/* ================= admin: preview uploaded photos & videos, toggle hide / bow for each ================= */
 const adminGrid = document.getElementById('admin-grid');
 const adminEmptyNote = document.getElementById('admin-empty-note');
 
 function renderAdminGrid(){
   if(!adminGrid) return;
   adminGrid.innerHTML = '';
-  adminEmptyNote.style.display = lastImageEntries.length ? 'none' : 'block';
-  lastImageEntries.forEach(item=>{
+  const allItems = [...lastImageEntries, ...lastVideoEntries];
+  adminEmptyNote.style.display = allItems.length ? 'none' : 'block';
+
+  function makeTile(mediaEl, hidden, bow, onToggleHide, onToggleBow){
     const wrap = document.createElement('div');
-    wrap.className = 'admin-pic-wrap' + (item.hidden ? ' is-hidden' : '');
-    const img = document.createElement('img');
-    img.src = item.src;
-    wrap.appendChild(img);
+    wrap.className = 'admin-pic-wrap' + (hidden ? ' is-hidden' : '');
+    wrap.appendChild(mediaEl);
 
     const eyeBtn = document.createElement('button');
-    eyeBtn.className = 'admin-toggle-btn eye-btn' + (item.hidden ? '' : ' active');
-    eyeBtn.textContent = item.hidden ? '🚫' : '👁';
-    eyeBtn.addEventListener('click', ()=>{
-      db.ref(`site/gallery/${item.id}/hidden`).set(!item.hidden);
-    });
+    eyeBtn.className = 'admin-toggle-btn eye-btn' + (hidden ? '' : ' active');
+    eyeBtn.textContent = hidden ? '🚫' : '👁';
+    eyeBtn.addEventListener('click', onToggleHide);
 
     const bowBtn = document.createElement('button');
-    bowBtn.className = 'admin-toggle-btn bow-btn' + (item.bow ? ' active' : '');
+    bowBtn.className = 'admin-toggle-btn bow-btn' + (bow ? ' active' : '');
     bowBtn.textContent = '🎀';
-    bowBtn.addEventListener('click', ()=>{
-      db.ref(`site/gallery/${item.id}/bow`).set(!item.bow);
-    });
+    bowBtn.addEventListener('click', onToggleBow);
 
     wrap.appendChild(eyeBtn);
     wrap.appendChild(bowBtn);
-    adminGrid.appendChild(wrap);
+    return wrap;
+  }
+
+  lastImageEntries.forEach(item=>{
+    const img = document.createElement('img');
+    img.src = item.src;
+    const tile = makeTile(img, item.hidden, item.bow,
+      ()=>db.ref(`site/gallery/${item.id}/hidden`).set(!item.hidden),
+      ()=>db.ref(`site/gallery/${item.id}/bow`).set(!item.bow)
+    );
+    adminGrid.appendChild(tile);
+  });
+
+  lastVideoEntries.forEach(item=>{
+    const vid = document.createElement('video');
+    vid.src = item.download_url;
+    vid.muted = true;
+    const tile = makeTile(vid, item.hidden, item.bow,
+      ()=>db.ref(`site/videoSettings/${item.key}/hidden`).set(!item.hidden),
+      ()=>db.ref(`site/videoSettings/${item.key}/bow`).set(!item.bow)
+    );
+    adminGrid.appendChild(tile);
   });
 }
+
 (async function loadVideosFromGithub(){
   try{
     const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FOLDER}`);
     if(res.ok){
       const files = await res.json();
-      lastVideoFiles = files.filter(f=>isVideoFile(f.name));
-      renderGallery(lastImageEntries, lastVideoFiles);
+      rawVideoFiles = files.filter(f=>isVideoFile(f.name));
+      mergeVideoEntries();
+      renderGallery(lastImageEntries, lastVideoEntries);
+      renderAdminGrid();
     }
   }catch(e){ /* silent — images still show fine */ }
 })();
