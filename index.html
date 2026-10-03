@@ -225,6 +225,7 @@
   }
   .admin-pic-wrap img,
   .admin-pic-wrap video{width:100%; height:100%; object-fit:cover; display:block;}
+  .admin-pic-wrap.is-hidden img{opacity:.35;}
   .admin-pic-wrap .del-btn{
     position:absolute; top:5px; left:5px;
     width:24px; height:24px;
@@ -234,6 +235,19 @@
     font-size:13px; line-height:1;
     cursor:pointer;
   }
+  .admin-toggle-btn{
+    position:absolute; bottom:5px;
+    width:26px; height:26px;
+    border:none; border-radius:50%;
+    background:rgba(20,10,25,.65);
+    color:#fff;
+    font-size:13px; line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .admin-toggle-btn.eye-btn{right:5px;}
+  .admin-toggle-btn.bow-btn{left:5px;}
+  .admin-toggle-btn.active{background:linear-gradient(135deg,var(--grad-a),var(--grad-b));}
   #admin-empty-note{
     text-align:center;
     color:var(--text-dim);
@@ -861,10 +875,9 @@
       🎬 عايز ترفع فيديو؟ دوسي هنا (بيرفع على GitHub)
     </a>
 
-    <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:18px; color:var(--text-mid); font-size:14px; cursor:pointer;">
-      <input type="checkbox" id="bow-toggle" style="width:18px; height:18px;" />
-      🎀 ضيفي فيونكة بينك على الصور
-    </label>
+    <div style="color:var(--text-dim); font-size:12.5px; text-align:center; margin-top:18px;">دوسي على 👁 تظهري/تخفي الصورة، ودوسي على 🎀 تحطي فيونكة عليها</div>
+    <div class="admin-grid" id="admin-grid"></div>
+    <div id="admin-empty-note">لسه مفيش صور مضافة</div>
 
     <button id="admin-done-btn" style="margin-top:18px;">خلصت، وريني الموقع 💗</button>
   </div>
@@ -1222,27 +1235,24 @@ function openLightbox(src, isVideo){
 lightboxClose.addEventListener('click', ()=>{ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; });
 lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox){ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; } });
 
-let showBow = false;
-function addBowIfEnabled(wrap){
-  if(!showBow) return;
-  const bow = document.createElement('div');
-  bow.className = 'pic-bow';
-  bow.textContent = '🎀';
-  wrap.appendChild(bow);
-}
-
 function renderGallery(imageItems, videoFiles){
   galleryGrid.innerHTML = '';
-  const total = imageItems.length + videoFiles.length;
+  const visibleImages = imageItems.filter(item=>!item.hidden);
+  const total = visibleImages.length + videoFiles.length;
   emptyNote.style.display = total ? 'none' : 'block';
-  imageItems.forEach(item=>{
+  visibleImages.forEach(item=>{
     const wrap = document.createElement('div');
     wrap.className = 'pic-wrap';
     const img = document.createElement('img');
     img.src = item.src;
     img.alt = '';
     wrap.appendChild(img);
-    addBowIfEnabled(wrap);
+    if(item.bow){
+      const bow = document.createElement('div');
+      bow.className = 'pic-bow';
+      bow.textContent = '🎀';
+      wrap.appendChild(bow);
+    }
     wrap.addEventListener('click', ()=>openLightbox(item.src, false));
     galleryGrid.appendChild(wrap);
   });
@@ -1253,36 +1263,61 @@ function renderGallery(imageItems, videoFiles){
     vid.src = file.download_url;
     vid.playsInline = true;
     wrap.appendChild(vid);
-    addBowIfEnabled(wrap);
     wrap.addEventListener('click', ()=>openLightbox(file.download_url, true));
     galleryGrid.appendChild(wrap);
   });
 }
 
-let lastImageItems = [];
+let lastImageEntries = []; // [{id, src, hidden, bow}]
 let lastVideoFiles = [];
 db.ref('site/gallery').on('value', snap=>{
   const val = snap.val() || {};
-  lastImageItems = Object.values(val);
-  renderGallery(lastImageItems, lastVideoFiles);
+  lastImageEntries = Object.entries(val).map(([id,item])=>({ id, ...item }));
+  renderGallery(lastImageEntries, lastVideoFiles);
+  renderAdminGrid();
 });
 
-const bowToggle = document.getElementById('bow-toggle');
-db.ref('site/settings/bow').on('value', snap=>{
-  showBow = !!snap.val();
-  bowToggle.checked = showBow;
-  renderGallery(lastImageItems, lastVideoFiles);
-});
-bowToggle.addEventListener('change', ()=>{
-  db.ref('site/settings/bow').set(bowToggle.checked);
-});
+/* ================= admin: preview uploaded photos, toggle hide / bow per photo ================= */
+const adminGrid = document.getElementById('admin-grid');
+const adminEmptyNote = document.getElementById('admin-empty-note');
+
+function renderAdminGrid(){
+  if(!adminGrid) return;
+  adminGrid.innerHTML = '';
+  adminEmptyNote.style.display = lastImageEntries.length ? 'none' : 'block';
+  lastImageEntries.forEach(item=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'admin-pic-wrap' + (item.hidden ? ' is-hidden' : '');
+    const img = document.createElement('img');
+    img.src = item.src;
+    wrap.appendChild(img);
+
+    const eyeBtn = document.createElement('button');
+    eyeBtn.className = 'admin-toggle-btn eye-btn' + (item.hidden ? '' : ' active');
+    eyeBtn.textContent = item.hidden ? '🚫' : '👁';
+    eyeBtn.addEventListener('click', ()=>{
+      db.ref(`site/gallery/${item.id}/hidden`).set(!item.hidden);
+    });
+
+    const bowBtn = document.createElement('button');
+    bowBtn.className = 'admin-toggle-btn bow-btn' + (item.bow ? ' active' : '');
+    bowBtn.textContent = '🎀';
+    bowBtn.addEventListener('click', ()=>{
+      db.ref(`site/gallery/${item.id}/bow`).set(!item.bow);
+    });
+
+    wrap.appendChild(eyeBtn);
+    wrap.appendChild(bowBtn);
+    adminGrid.appendChild(wrap);
+  });
+}
 (async function loadVideosFromGithub(){
   try{
     const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FOLDER}`);
     if(res.ok){
       const files = await res.json();
       lastVideoFiles = files.filter(f=>isVideoFile(f.name));
-      renderGallery(lastImageItems, lastVideoFiles);
+      renderGallery(lastImageEntries, lastVideoFiles);
     }
   }catch(e){ /* silent — images still show fine */ }
 })();
