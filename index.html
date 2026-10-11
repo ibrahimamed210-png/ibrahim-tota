@@ -38,6 +38,14 @@
 
   /* floating hearts rising through the background */
   .hearts{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
+  .aurora{position:fixed; inset:0; z-index:0; overflow:hidden; filter:blur(70px); opacity:.5; pointer-events:none;}
+  .aurora .blob{position:absolute; border-radius:50%; mix-blend-mode:screen;}
+  .aurora .b1{width:340px; height:340px; background:var(--grad-a); top:-90px; left:-70px; animation:drift1 18s ease-in-out infinite;}
+  .aurora .b2{width:300px; height:300px; background:var(--grad-b); bottom:-70px; right:-50px; animation:drift2 22s ease-in-out infinite;}
+  .aurora .b3{width:260px; height:260px; background:var(--grad-c); top:42%; left:58%; animation:drift3 26s ease-in-out infinite;}
+  @keyframes drift1{0%,100%{transform:translate(0,0);} 50%{transform:translate(60px,40px);}}
+  @keyframes drift2{0%,100%{transform:translate(0,0);} 50%{transform:translate(-50px,-30px);}}
+  @keyframes drift3{0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,50px);}}
   .stars{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
   .stars span{
     position:absolute;
@@ -345,7 +353,6 @@
     text-align:center;
     margin-bottom:22px;
   }
-  section h2 .dot{color:var(--grad-a);}
 
   /* ---- counter ---- */
   .counter-grid{
@@ -413,46 +420,6 @@
     width:fit-content;
   }
   .mini-word svg{width:22px; height:22px; flex:0 0 auto;}
-  .cards-line{
-    text-align:center;
-    font-family:'Baloo Bhaijaan 2', sans-serif;
-    font-weight:600;
-    font-size:19px;
-    color:var(--text-mid);
-    margin:32px 0 18px;
-  }
-  .flip-cards-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px;
-  }
-  .flip-card{aspect-ratio:3/4; perspective:1000px; cursor:pointer; direction:ltr;}
-  .flip-inner{
-    position:relative; width:100%; height:100%;
-    transition:transform .6s;
-    transform-style:preserve-3d;
-  }
-  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
-  .flip-front, .flip-back{
-    position:absolute; inset:0;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    direction:rtl;
-    border-radius:16px;
-    border:1px solid var(--glass-border);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:10px; padding:12px;
-  }
-  .flip-front{background:linear-gradient(135deg,rgba(255,45,120,.3),rgba(139,47,255,.3));}
-  .flip-back{
-    transform:rotateY(180deg);
-    background:linear-gradient(135deg,rgba(255,194,51,.24),rgba(255,95,61,.24));
-  }
-  .flip-front span, .flip-back span{
-    font-weight:800; font-size:16px; color:var(--text-hi);
-    text-align:center; line-height:1.45;
-  }
-  .flip-heart-icon{width:22px; height:22px; flex:0 0 auto;}
 
   /* ---- timeline ---- */
   .timeline{
@@ -492,6 +459,12 @@
     font-weight:700;
     color:var(--text-hi);
   }
+  .timeline-note{
+    font-size:13.5px;
+    color:var(--text-mid);
+    margin-top:3px;
+  }
+  .timeline-note:empty{display:none;}
 
   /* ---- letter ---- */
   .letter{
@@ -510,6 +483,111 @@
     color:var(--text-hi);
   }
   .heart-icon{width:22px; height:22px; flex:0 0 auto;}
+  .reply-signature{
+    margin-top:14px;
+    justify-content:flex-end;
+  }
+  .reply-signature.hidden{display:none;}
+
+  /* ---- animated heart ---- */
+  .heart-card{
+    padding:0;
+    overflow:hidden;
+    background:#111;
+    border-color:rgba(255,106,156,.25);
+  }
+  #heart-canvas{
+    display:block;
+    width:100%;
+    height:360px;
+  }
+
+  /* ---- daily reason ---- */
+  .reasons-day{
+    font-size:13px;
+    font-weight:600;
+    color:var(--grad-c);
+    margin-bottom:12px;
+    letter-spacing:.3px;
+  }
+  .reasons-today{
+    font-size:19px;
+    font-weight:700;
+    color:var(--text-hi);
+    line-height:1.7;
+    min-height:50px;
+    opacity:0;
+    animation:reasonFade .6s ease forwards;
+  }
+  @keyframes reasonFade{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---- memory box ---- */
+  .box-emoji{
+    font-size:64px;
+    margin-bottom:10px;
+    display:inline-block;
+    animation:boxFloat 2.6s ease-in-out infinite;
+    filter:drop-shadow(0 8px 18px rgba(255,106,156,.35));
+  }
+  @keyframes boxFloat{
+    0%,100%{transform:translateY(0) rotate(-3deg);}
+    50%{transform:translateY(-8px) rotate(3deg);}
+  }
+  .box-emoji.shaking{animation:boxShake .45s ease;}
+  @keyframes boxShake{
+    0%,100%{transform:translate(0,0) rotate(0);}
+    20%{transform:translate(-6px,0) rotate(-8deg);}
+    40%{transform:translate(6px,0) rotate(8deg);}
+    60%{transform:translate(-5px,0) rotate(-6deg);}
+    80%{transform:translate(5px,0) rotate(6deg);}
+  }
+  #memory-box-open.hidden{display:none;}
+  .memory-pic{animation:memPopIn .5s ease both;}
+  @keyframes memPopIn{
+    from{opacity:0; transform:scale(.7) translateY(12px);}
+    to{opacity:1; transform:scale(1) translateY(0);}
+  }
+  .surprise-style-btn{
+    padding:13px 34px;
+    border:none;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15.5px;
+    cursor:pointer;
+    box-shadow:0 10px 26px rgba(255,95,150,.3);
+    transition:transform .2s;
+  }
+  .surprise-style-btn:hover{transform:translateY(-2px);}
+
+  /* ---- surprise button ---- */
+  #surprise-text{
+    color:var(--text-mid);
+    font-size:15.5px;
+    line-height:1.9;
+    margin-bottom:20px;
+    min-height:54px;
+  }
+  #surprise-btn{
+    padding:13px 34px;
+    border:none;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15.5px;
+    cursor:pointer;
+    box-shadow:0 10px 26px rgba(255,95,150,.3);
+    transition:transform .2s;
+  }
+  #surprise-btn:hover{transform:translateY(-2px);}
+  #surprise-btn:active{transform:scale(.97);}
 
   /* ---- reply ---- */
   #reply-box{
@@ -542,6 +620,7 @@
     transition:transform .2s;
   }
   #save-reply-btn:hover{transform:translateY(-1px);}
+  #save-reply-btn.hidden{display:none;}
   #reply-saved-note{
     text-align:center;
     color:var(--grad-c);
@@ -638,956 +717,4 @@
     font-size:12px;
     z-index:1;
   }
-  .reaction-badges:empty{display:none;}
-  #chat-empty-note{
-    text-align:center;
-    color:var(--text-dim);
-    font-size:13.5px;
-    padding:10px 0;
-  }
-  .chat-input-row{display:flex; gap:8px;}
-  #chat-input{
-    flex:1;
-    padding:12px 14px;
-    border-radius:14px;
-    border:1px solid var(--glass-border);
-    background:rgba(255,255,255,.05);
-    color:var(--text-hi);
-    font-family:'Cairo', sans-serif;
-    font-size:14.5px;
-  }
-  #chat-input::placeholder{color:var(--text-dim);}
-  #chat-send-btn{
-    padding:0 20px;
-    border:none;
-    border-radius:14px;
-    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
-    color:#fff;
-    font-family:'Cairo', sans-serif;
-    font-weight:700;
-    font-size:15px;
-    cursor:pointer;
-  }
-  #chat-whoami{
-    text-align:center;
-    color:var(--text-dim);
-    font-size:12px;
-    margin-top:10px;
-  }
-  #chat-status{
-    text-align:center;
-    font-size:12.5px;
-    font-weight:600;
-    color:var(--text-dim);
-    margin-bottom:8px;
-    min-height:16px;
-  }
-  #chat-status.online{color:#7dffb0;}
-  .seen-tick{
-    display:block;
-    font-size:10px;
-    opacity:.75;
-    margin-top:3px;
-    text-align:left;
-  }
-
-  /* ---- gallery ---- */
-  .gallery-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-    gap:14px;
-    margin-bottom:18px;
-  }
-  .pic-wrap{
-    position:relative;
-    aspect-ratio:1/1;
-    border-radius:16px;
-    overflow:hidden;
-    border:2.5px solid transparent;
-    background:
-      linear-gradient(var(--bg-2),var(--bg-2)) padding-box,
-      linear-gradient(135deg,var(--grad-a),var(--grad-b),var(--grad-c)) border-box;
-    box-shadow:0 4px 16px rgba(0,0,0,.25);
-    transition:transform .25s ease;
-    cursor:pointer;
-  }
-  .pic-wrap:hover{transform:scale(1.04);}
-  .pic-wrap img,
-  .pic-wrap video{width:100%; height:100%; object-fit:cover; display:block; border-radius:13px;}
-  .pic-bow{
-    position:absolute; top:-6px; right:6px;
-    font-size:28px;
-    filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
-    pointer-events:none;
-    transform:rotate(8deg);
-    z-index:2;
-  }
-
-  /* lightbox: tap a photo to see it enlarged */
-  #lightbox{
-    position:fixed; inset:0; z-index:60;
-    display:none;
-    align-items:center; justify-content:center;
-    background:rgba(10,5,15,.92);
-    padding:20px;
-  }
-  #lightbox.show{display:flex;}
-  #lightbox img, #lightbox video{
-    max-width:100%; max-height:85vh;
-    border-radius:14px;
-    box-shadow:0 20px 60px rgba(0,0,0,.5);
-  }
-  #lightbox-close{
-    position:absolute; top:18px; left:18px;
-    width:40px; height:40px;
-    border-radius:50%;
-    border:none;
-    background:rgba(255,255,255,.12);
-    color:#fff;
-    font-size:20px;
-    cursor:pointer;
-  }
-  .pic-wrap .del-btn{
-    position:absolute; top:6px; left:6px;
-    width:24px; height:24px;
-    border:none; border-radius:50%;
-    background:rgba(20,10,25,.55);
-    backdrop-filter:blur(4px);
-    color:#fff;
-    font-size:13px; line-height:1;
-    cursor:pointer;
-  }
-  .empty-note{
-    text-align:center;
-    color:var(--text-dim);
-    font-size:14.5px;
-    padding:6px 0 18px;
-  }
-  #upload-label{
-    display:block;
-    text-align:center;
-    padding:14px;
-    border:1.5px dashed var(--glass-border);
-    border-radius:14px;
-    color:var(--text-mid);
-    font-weight:600;
-    font-size:15px;
-    cursor:pointer;
-    transition:background .2s, border-color .2s;
-  }
-  #upload-label:hover{background:rgba(255,255,255,.04); border-color:var(--grad-a);}
-  #photo-input{display:none;}
-
-  footer.credit{
-    text-align:center;
-    font-size:13px;
-    color:var(--text-dim);
-    margin-top:8px;
-  }
-
-  /* ---------- music player: floating glass pill ---------- */
-  #player-bar{
-    position:fixed; bottom:18px; left:50%;
-    transform:translate(-50%,140%);
-    z-index:40;
-    display:flex; align-items:center; gap:10px;
-    background:var(--glass-2);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    border:1px solid var(--glass-border);
-    border-radius:999px;
-    padding:8px 10px 8px 16px;
-    max-width:92vw;
-    box-shadow:0 18px 40px rgba(0,0,0,.4);
-    transition:transform .6s ease;
-  }
-  #player-bar.show{transform:translate(-50%,0);}
-  #play-toggle{
-    flex:0 0 auto;
-    width:38px; height:38px;
-    border-radius:50%;
-    border:none;
-    background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-  }
-  #song-info{
-    font-size:13.5px;
-    color:var(--text-mid);
-    max-width:150px;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-  }
-  #song-info b{color:var(--text-hi); font-weight:700;}
-  .note-icon{font-size:14px; animation:spin 3s linear infinite; animation-play-state:paused; display:inline-block;}
-  .note-icon.playing{animation-play-state:running;}
-  @keyframes spin{from{transform:rotate(0)} to{transform:rotate(360deg)}}
-  #song-upload-btn{
-    flex:0 0 auto;
-    width:30px; height:30px;
-    border-radius:50%;
-    border:1px solid var(--glass-border);
-    background:transparent;
-    color:var(--text-mid);
-    font-size:13px;
-    cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-  }
-  #song-upload-btn:hover{background:rgba(255,255,255,.06); color:var(--text-hi);}
-</style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-</head>
-<body>
-
-<div class="stars" id="stars" aria-hidden="true"></div>
-<div class="hearts" id="hearts" aria-hidden="true"></div>
-
-<!-- ================= PASSWORD SCREEN ================= -->
-<div id="lock-screen">
-  <div class="lock-box">
-    <svg class="lock-heart" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="hg1" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#ff5f96"/><stop offset="1" stop-color="#8a5cff"/></linearGradient></defs>
-      <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
-    </svg>
-    <div class="lock-title">Ibrahim &amp; Tota</div>
-    <div class="lock-sub">جاهزه للمفاجأه يا روح قلبي 💕</div>
-    <input type="password" id="password-input" placeholder="l o v e" />
-    <button id="unlock-btn">دوسي يا روحي 💗</button>
-    <div id="lock-error"></div>
-  </div>
-</div>
-
-<!-- ================= ADMIN PANEL ================= -->
-<div id="admin-panel" class="hidden">
-  <div class="admin-box">
-    <div class="admin-title">لوحة التحكم</div>
-    <div class="admin-sub">صور ترفعيها هنا تظهر فورًا لأي حد يفتح الموقع</div>
-
-    <label id="admin-upload-label" for="admin-photo-input">📷 دوسي هنا لإضافة صورة</label>
-    <input type="file" id="admin-photo-input" accept="image/*" multiple />
-    <div id="admin-upload-note" style="color:var(--text-dim); font-size:12.5px; text-align:center; margin-top:4px; min-height:16px;"></div>
-
-    <a id="admin-upload-link" class="admin-upload-label" href="#" target="_blank" style="text-decoration:none; display:block; margin-top:16px; font-size:13.5px;">
-      🎬 عايز ترفع فيديو؟ دوسي هنا (بيرفع على GitHub)
-    </a>
-
-    <div style="color:var(--text-dim); font-size:12.5px; text-align:center; margin-top:18px;">دوسي على 👁 تظهري/تخفي الصورة، ودوسي على 🎀 تحطي فيونكة عليها</div>
-    <div class="admin-grid" id="admin-grid"></div>
-    <div id="admin-empty-note">لسه مفيش صور</div>
-
-    <button id="admin-done-btn" style="margin-top:18px;">خلصت، وريني الموقع 💗</button>
-  </div>
-</div>
-
-<!-- ================= MAIN SITE ================= -->
-<div id="site">
-
-  <header class="hero">
-    <div class="names">Ibrahim <span style="color:var(--grad-c); font-size:.7em;">&amp;</span> Tota</div>
-    <div class="hero-line">كل تفصيلة هنا ليكي يا نور عيني </div>
-    <div class="divider"></div>
-  </header>
-
-  <section class="reveal" id="counter-section">
-    <h2><span class="dot">·</span> العداد ده مش هيقف ابداا <span class="dot">·</span></h2>
-    <div class="glass-card">
-      <div class="counter-grid">
-        <div class="counter-box"><div class="counter-num" id="c-days">0</div><div class="counter-label">يوم</div></div>
-        <div class="counter-box"><div class="counter-num" id="c-hours">0</div><div class="counter-label">ساعة</div></div>
-        <div class="counter-box"><div class="counter-num" id="c-mins">0</div><div class="counter-label">دقيقة</div></div>
-        <div class="counter-box"><div class="counter-num" id="c-secs">0</div><div class="counter-label">ثانية</div></div>
-      </div>
-      <div class="counter-note">وكل ثانية فيهم بيزيد حبي ليكي اكتر من الثانيه اللي قبلها  🌷</div>
-    </div>
-  </section>
-
-  <section class="reveal" id="stop-section" style="margin-top:44px;">
-    <div class="glass-card">
-      <div class="stop-line">😂اقفي هنا شوية متجريش</div>
-      <div class="mini-words">
-        <div class="mini-word">
-          <svg viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-          <span>بحبك اوي يا نورعيني</span>
-          <svg viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-        </div>
-        <div class="mini-word">
-          <svg viewBox="0 0 24 24" fill="var(--grad-c)" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 7.1-1.01L12 2z"/></svg>
-          <span>بعشقكك</span>
-          <svg viewBox="0 0 24 24" fill="var(--grad-c)" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 7.1-1.01L12 2z"/></svg>
-        </div>
-        <div class="mini-word">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--grad-b)" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          <span>ربنا يخليكي ليا يا روحي</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--grad-b)" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal" id="cards-section" style="margin-top:26px;">
-    <div class="glass-card">
-      <div class="cards-line">❤😉 دوسي علي الكروت</div>
-      <div class="flip-cards-grid">
-        <div class="flip-card">
-          <div class="flip-inner">
-            <div class="flip-front"><span>😂🙋اول كارت اهوووو</span></div>
-            <div class="flip-back">
-              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-              <span>محبتش</span>
-            </div>
-          </div>
-        </div>
-        <div class="flip-card">
-          <div class="flip-inner">
-            <div class="flip-front"><span>التاني</span></div>
-            <div class="flip-back">
-              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-              <span>ولا بحب</span>
-            </div>
-          </div>
-        </div>
-        <div class="flip-card">
-          <div class="flip-inner">
-            <div class="flip-front"><span>التالت</span></div>
-            <div class="flip-back">
-              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-              <span>ولا هحب حد</span>
-            </div>
-          </div>
-        </div>
-        <div class="flip-card">
-          <div class="flip-inner">
-            <div class="flip-front"><span>الرابع</span></div>
-            <div class="flip-back">
-              <svg class="flip-heart-icon" viewBox="0 0 24 24" fill="var(--grad-a)" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z"/></svg>
-              <span>زي ما حبيتك يا اجمل حاجه في حياتي ❤</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal" id="timeline-section" style="margin-top:26px;">
-    <h2><span class="dot">·</span> محطاتنا <span class="dot">·</span></h2>
-    <div class="glass-card">
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot">💬</div>
-          <div class="timeline-date">3 أغسطس</div>
-          <div class="timeline-title">أول مرة اتكلمنا</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot">📍</div>
-          <div class="timeline-date">11 أغسطس</div>
-          <div class="timeline-title">أول مرة اتقابلنا</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot">❤️</div>
-          <div class="timeline-date">15 أغسطس</div>
-          <div class="timeline-title">أول مرة قلتلك بحبك</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal" id="letter-section">
-    <h2><span class="dot">·</span> كلمة من قلبيي <span class="dot">·</span></h2>
-    <div class="glass-card">
-      <div class="letter" id="letter-text">
-        <div class="signature">
-          <svg class="heart-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
-          </svg>
-          Ebrahim
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal" id="reply-section">
-    <h2><span class="dot">·</span> دلوقتي دورك يا قلبيي <span class="dot">·</span></h2>
-    <div class="glass-card">
-      <textarea id="reply-box" placeholder="اكتبيلي اللي انتي عايزه تكتبيه يا روحي ... 💌" rows="5"></textarea>
-      <button id="save-reply-btn">احفظي 💗</button>
-      <div id="reply-saved-note"></div>
-    </div>
-  </section>
-
-  <section class="reveal" id="chat-corner">
-    <h2><span class="dot">·</span> ركن الشات بتاعنا <span class="dot">·</span></h2>
-    <div class="glass-card">
-      <div id="chat-name-gate">
-        <p>إنت مين اللي بيدخل؟</p>
-        <div class="chat-name-btns">
-          <button class="chat-name-btn" data-name="Ibrahim">إبراهيم</button>
-          <button class="chat-name-btn" data-name="Tota">توتا</button>
-        </div>
-      </div>
-      <div id="chat-window" class="hidden">
-        <div id="chat-status"></div>
-        <div id="chat-messages"></div>
-        <div id="chat-empty-note">لسه مفيش رسايل، ابدأ الكلام 💬</div>
-        <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="اكتب رسالة..." />
-          <button id="chat-send-btn">ابعت</button>
-        </div>
-        <div id="chat-whoami"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal" id="gallery-section">
-    <h2><span class="dot">·</span> لحظاتنا <span class="dot">·</span></h2>
-    <div class="gallery-grid" id="gallery-grid"></div>
-    <div class="empty-note" id="empty-note">لسه مفيش صور أو فيديوهات هنا</div>
-  </section>
-
-  <footer class="credit">بعشقك يا عمريي 💗</footer>
-</div>
-
-<!-- ================= MUSIC PLAYER ================= -->
-
-<div id="player-bar">
-  <button id="play-toggle">▶</button>
-  <div id="song-info"><span class="note-icon" id="note-icon">🎵</span> <b id="song-name">توليت — إنت حبيبي</b></div>
-  <audio id="bg-audio" src="song.mp3" loop preload="none"></audio>
-</div>
-
-<div id="lightbox">
-  <button id="lightbox-close">✕</button>
-  <div id="lightbox-content"></div>
-</div>
-
-<script>
-/* ================= reveal sections on scroll (one-time, lightweight) ================= */
-(function(){
-  const targets = document.querySelectorAll('section.reveal');
-  if(!('IntersectionObserver' in window)){
-    targets.forEach(t=>t.classList.add('in-view'));
-    return;
-  }
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  targets.forEach(t=>io.observe(t));
-})();
-
-/* ================= static twinkling stars (cheap, low count) ================= */
-(function(){
-  const wrap = document.getElementById('stars');
-  for(let i=0;i<18;i++){
-    const s = document.createElement('span');
-    s.style.left = Math.random()*100+'%';
-    s.style.top = Math.random()*100+'%';
-    s.style.animationDelay = (Math.random()*3.5)+'s';
-    wrap.appendChild(s);
-  }
-})();
-
-/* ================= floating hearts (single ambient effect) ================= */
-(function(){
-  const wrap = document.getElementById('hearts');
-  for(let i=0;i<5;i++){
-    const s = document.createElement('span');
-    s.textContent = '❤️';
-    s.style.left = Math.random()*100+'%';
-    s.style.fontSize = (14+Math.random()*14)+'px';
-    s.style.setProperty('--drift', (Math.random()*60-30)+'px');
-    s.style.animationDuration = (14+Math.random()*14)+'s';
-    s.style.animationDelay = (Math.random()*16)+'s';
-    wrap.appendChild(s);
-  }
-})();
-
-/* ================= password lock ================= */
-const CORRECT_PASSWORD = "love";
-const ADMIN_PASSWORD = "admin";
-const lockScreen = document.getElementById('lock-screen');
-const pwInput = document.getElementById('password-input');
-const unlockBtn = document.getElementById('unlock-btn');
-const lockError = document.getElementById('lock-error');
-const site = document.getElementById('site');
-const playerBar = document.getElementById('player-bar');
-const audio = document.getElementById('bg-audio');
-const adminPanel = document.getElementById('admin-panel');
-
-function enterSite(){
-  lockScreen.classList.add('hidden');
-  adminPanel.classList.add('hidden');
-  site.classList.add('show');
-  playerBar.classList.add('show');
-  startCounter();
-  attemptAutoplay();
-}
-
-function tryUnlock(){
-  const val = pwInput.value.trim().toLowerCase();
-  if(val === CORRECT_PASSWORD){
-    enterSite();
-  } else if(val === ADMIN_PASSWORD){
-    lockScreen.classList.add('hidden');
-    adminPanel.classList.remove('hidden');
-  } else {
-    lockError.textContent = "الباسورد غلط، جربي تاني 🌷";
-    pwInput.value = '';
-  }
-}
-unlockBtn.addEventListener('click', tryUnlock);
-pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
-
-/* ================= counter ================= */
-// تاريخ البداية متخزن هنا من غير ما يتعرض في الصفحة
-const START_TIME = new Date(2026, 7, 3, 3, 6, 0).getTime(); // شهر 7 = أغسطس (index من صفر)
-
-function startCounter(){
-  updateCounter();
-  setInterval(updateCounter, 1000);
-}
-function updateCounter(){
-  const now = Date.now();
-  let diff = Math.max(0, now - START_TIME);
-  const days = Math.floor(diff/(1000*60*60*24));
-  const hours = Math.floor((diff/(1000*60*60))%24);
-  const mins = Math.floor((diff/(1000*60))%60);
-  const secs = Math.floor((diff/1000)%60);
-  document.getElementById('c-days').textContent = days;
-  document.getElementById('c-hours').textContent = hours;
-  document.getElementById('c-mins').textContent = mins;
-  document.getElementById('c-secs').textContent = secs;
-}
-
-/* ================= music player (song is fixed — set via song.mp3) ================= */
-const playToggle = document.getElementById('play-toggle');
-const noteIcon = document.getElementById('note-icon');
-
-function attemptAutoplay(){
-  if(!audio.src) return;
-  const p = audio.play();
-  if(p !== undefined){
-    p.then(()=>{ setPlayingUI(true); })
-     .catch(()=>{ setPlayingUI(false); });
-  }
-}
-function setPlayingUI(playing){
-  playToggle.textContent = playing ? '⏸' : '▶';
-  noteIcon.classList.toggle('playing', playing);
-}
-playToggle.addEventListener('click', ()=>{
-  if(audio.paused){
-    audio.play().then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false));
-  } else {
-    audio.pause();
-    setPlayingUI(false);
-  }
-});
-audio.addEventListener('pause', ()=>setPlayingUI(false));
-audio.addEventListener('play', ()=>setPlayingUI(true));
-
-/* ================= flip cards ================= */
-document.querySelectorAll('.flip-card').forEach(card=>{
-  card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); });
-});
-
-/* ================= Firebase setup (real database, real-time) ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyBRcrHYtBjnycY1tmAjz_KWGX9j9mNb4dg",
-  authDomain: "ibrahim-tota.firebaseapp.com",
-  databaseURL: "https://ibrahim-tota-default-rtdb.firebaseio.com",
-  projectId: "ibrahim-tota",
-  storageBucket: "ibrahim-tota.firebasestorage.app",
-  messagingSenderId: "545374194132",
-  appId: "1:545374194132:web:d0813ec29889498588ee41"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-/* ================= gallery: images uploaded directly from the site (stored in Firebase),
-   videos uploaded via GitHub (too large for the free database) ================= */
-const galleryGrid = document.getElementById('gallery-grid');
-const emptyNote = document.getElementById('empty-note');
-const GH_OWNER = 'ibrahimamed210-png';
-const GH_REPO = 'ibrahim-tota';
-const GH_FOLDER = 'gallery';
-const VIDEO_EXT = ['mp4','mov','webm','m4v'];
-function isVideoFile(name){ return VIDEO_EXT.includes((name||'').split('.').pop().toLowerCase()); }
-
-const lightbox = document.getElementById('lightbox');
-const lightboxContent = document.getElementById('lightbox-content');
-const lightboxClose = document.getElementById('lightbox-close');
-function openLightbox(src, isVideo){
-  lightboxContent.innerHTML = '';
-  const el = document.createElement(isVideo ? 'video' : 'img');
-  el.src = src;
-  if(isVideo){ el.controls = true; el.playsInline = true; el.autoplay = true; }
-  lightboxContent.appendChild(el);
-  lightbox.classList.add('show');
-}
-lightboxClose.addEventListener('click', ()=>{ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; });
-lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox){ lightbox.classList.remove('show'); lightboxContent.innerHTML=''; } });
-
-/* video filenames can contain characters Firebase keys don't allow, so we
-   sanitize them into a safe key to store each video's hidden/bow state */
-function safeKey(name){ return name.replace(/[.#$\[\]\/]/g, '_'); }
-
-function renderGallery(imageItems, videoItems){
-  galleryGrid.innerHTML = '';
-  const visibleImages = imageItems.filter(item=>!item.hidden);
-  const visibleVideos = videoItems.filter(item=>!item.hidden);
-  const total = visibleImages.length + visibleVideos.length;
-  emptyNote.style.display = total ? 'none' : 'block';
-  visibleImages.forEach(item=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'pic-wrap';
-    const img = document.createElement('img');
-    img.src = item.src;
-    img.alt = '';
-    wrap.appendChild(img);
-    if(item.bow){
-      const bow = document.createElement('div');
-      bow.className = 'pic-bow';
-      bow.textContent = '🎀';
-      wrap.appendChild(bow);
-    }
-    wrap.addEventListener('click', ()=>openLightbox(item.src, false));
-    galleryGrid.appendChild(wrap);
-  });
-  visibleVideos.forEach(item=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'pic-wrap';
-    const vid = document.createElement('video');
-    vid.src = item.download_url;
-    vid.playsInline = true;
-    wrap.appendChild(vid);
-    if(item.bow){
-      const bow = document.createElement('div');
-      bow.className = 'pic-bow';
-      bow.textContent = '🎀';
-      wrap.appendChild(bow);
-    }
-    wrap.addEventListener('click', ()=>openLightbox(item.download_url, true));
-    galleryGrid.appendChild(wrap);
-  });
-}
-
-let lastImageEntries = []; // [{id, src, hidden, bow}]
-let lastVideoEntries = []; // [{key, name, download_url, hidden, bow}]
-let rawVideoFiles = [];    // raw GitHub file list, refreshed occasionally
-let videoSettings = {};    // from Firebase: { safeKey: {hidden, bow} }
-
-function mergeVideoEntries(){
-  lastVideoEntries = rawVideoFiles.map(f=>{
-    const key = safeKey(f.name);
-    const s = videoSettings[key] || {};
-    return { key, name: f.name, download_url: f.download_url, hidden: !!s.hidden, bow: !!s.bow };
-  });
-}
-
-db.ref('site/gallery').on('value', snap=>{
-  const val = snap.val() || {};
-  lastImageEntries = Object.entries(val).map(([id,item])=>({ id, ...item }));
-  renderGallery(lastImageEntries, lastVideoEntries);
-  renderAdminGrid();
-});
-
-db.ref('site/videoSettings').on('value', snap=>{
-  videoSettings = snap.val() || {};
-  mergeVideoEntries();
-  renderGallery(lastImageEntries, lastVideoEntries);
-  renderAdminGrid();
-});
-
-/* ================= admin: preview uploaded photos & videos, toggle hide / bow for each ================= */
-const adminGrid = document.getElementById('admin-grid');
-const adminEmptyNote = document.getElementById('admin-empty-note');
-
-function renderAdminGrid(){
-  if(!adminGrid) return;
-  adminGrid.innerHTML = '';
-  const allItems = [...lastImageEntries, ...lastVideoEntries];
-  adminEmptyNote.style.display = allItems.length ? 'none' : 'block';
-
-  function makeTile(mediaEl, hidden, bow, onToggleHide, onToggleBow){
-    const wrap = document.createElement('div');
-    wrap.className = 'admin-pic-wrap' + (hidden ? ' is-hidden' : '');
-    wrap.appendChild(mediaEl);
-
-    const eyeBtn = document.createElement('button');
-    eyeBtn.className = 'admin-toggle-btn eye-btn' + (hidden ? '' : ' active');
-    eyeBtn.textContent = hidden ? '🚫' : '👁';
-    eyeBtn.addEventListener('click', onToggleHide);
-
-    const bowBtn = document.createElement('button');
-    bowBtn.className = 'admin-toggle-btn bow-btn' + (bow ? ' active' : '');
-    bowBtn.textContent = '🎀';
-    bowBtn.addEventListener('click', onToggleBow);
-
-    wrap.appendChild(eyeBtn);
-    wrap.appendChild(bowBtn);
-    return wrap;
-  }
-
-  lastImageEntries.forEach(item=>{
-    const img = document.createElement('img');
-    img.src = item.src;
-    const tile = makeTile(img, item.hidden, item.bow,
-      ()=>db.ref(`site/gallery/${item.id}/hidden`).set(!item.hidden),
-      ()=>db.ref(`site/gallery/${item.id}/bow`).set(!item.bow)
-    );
-    adminGrid.appendChild(tile);
-  });
-
-  lastVideoEntries.forEach(item=>{
-    const vid = document.createElement('video');
-    vid.src = item.download_url;
-    vid.muted = true;
-    const tile = makeTile(vid, item.hidden, item.bow,
-      ()=>db.ref(`site/videoSettings/${item.key}/hidden`).set(!item.hidden),
-      ()=>db.ref(`site/videoSettings/${item.key}/bow`).set(!item.bow)
-    );
-    adminGrid.appendChild(tile);
-  });
-}
-
-(async function loadVideosFromGithub(){
-  try{
-    const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FOLDER}`);
-    if(res.ok){
-      const files = await res.json();
-      rawVideoFiles = files.filter(f=>isVideoFile(f.name));
-      mergeVideoEntries();
-      renderGallery(lastImageEntries, lastVideoEntries);
-      renderAdminGrid();
-    }
-  }catch(e){ /* silent — images still show fine */ }
-})();
-
-/* ================= admin panel: upload images (resized) straight to Firebase ================= */
-const adminPhotoInput = document.getElementById('admin-photo-input');
-const adminUploadNote = document.getElementById('admin-upload-note');
-const adminDoneBtn = document.getElementById('admin-done-btn');
-const adminUploadLink = document.getElementById('admin-upload-link');
-if(adminUploadLink){
-  adminUploadLink.href = `https://github.com/${GH_OWNER}/${GH_REPO}/upload/main/${GH_FOLDER}`;
-}
-
-function resizeImageFile(file, maxDim){
-  return new Promise((resolve, reject)=>{
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      img.onload = ()=>{
-        let { width, height } = img;
-        if(width > height && width > maxDim){ height = height*(maxDim/width); width = maxDim; }
-        else if(height > maxDim){ width = width*(maxDim/height); height = maxDim; }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.72));
-      };
-      img.onerror = reject;
-      img.src = reader.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-adminPhotoInput.addEventListener('change', async (e)=>{
-  const files = Array.from(e.target.files || []);
-  if(!files.length) return;
-  adminUploadNote.textContent = 'بترفع...';
-  try{
-    for(const file of files){
-      const dataUrl = await resizeImageFile(file, 1000);
-      await db.ref('site/gallery').push({ src: dataUrl });
-    }
-    adminUploadNote.textContent = 'اتضافت 💗';
-  }catch(e){
-    adminUploadNote.textContent = 'حصلت مشكلة، جربي تاني';
-  }
-  setTimeout(()=>{ adminUploadNote.textContent = ''; }, 2500);
-  adminPhotoInput.value = '';
-});
-
-adminDoneBtn.addEventListener('click', ()=>{ enterSite(); });
-
-/* ================= her reply box ================= */
-const replyBox = document.getElementById('reply-box');
-const saveReplyBtn = document.getElementById('save-reply-btn');
-const replySavedNote = document.getElementById('reply-saved-note');
-const replyRef = db.ref('site/reply');
-
-replyRef.on('value', snap=>{
-  if(document.activeElement !== replyBox){ replyBox.value = snap.val() || ''; }
-});
-saveReplyBtn.addEventListener('click', ()=>{
-  replySavedNote.textContent = 'بتتحفظ...';
-  replyRef.set(replyBox.value)
-    .then(()=>{ replySavedNote.textContent = 'اتحفظ يا قمر 💌'; })
-    .catch(()=>{ replySavedNote.textContent = 'حصلت مشكلة، جربي تاني'; })
-    .finally(()=>{ setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500); });
-});
-
-/* ================= chat corner (messages + online/typing/seen + reactions) ================= */
-const CHAT_NAME_KEY = 'ibrahim_tota_chat_name';
-const chatNameGate = document.getElementById('chat-name-gate');
-const chatWindow = document.getElementById('chat-window');
-const chatMessagesEl = document.getElementById('chat-messages');
-const chatEmptyNote = document.getElementById('chat-empty-note');
-const chatInput = document.getElementById('chat-input');
-const chatSendBtn = document.getElementById('chat-send-btn');
-const chatWhoami = document.getElementById('chat-whoami');
-const chatStatusEl = document.getElementById('chat-status');
-const REACTION_EMOJIS = ['❤️','😂','😮','😢','👍'];
-
-let myChatName = localStorage.getItem(CHAT_NAME_KEY);
-let latestPresence = {};
-
-function otherChatName(){ return myChatName === 'Ibrahim' ? 'Tota' : 'Ibrahim'; }
-function labelOf(name){ return name === 'Ibrahim' ? 'إبراهيم' : 'توتا'; }
-
-function renderChatMessages(messages){
-  chatMessagesEl.innerHTML = '';
-  chatEmptyNote.style.display = messages.length ? 'none' : 'block';
-  const other = latestPresence[otherChatName()] || {};
-  messages.forEach(m=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'chat-bubble-wrap ' + (m.sender === myChatName ? 'mine' : 'theirs');
-
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
-    bubble.innerHTML = `<span class="sender">${labelOf(m.sender)}</span>`;
-    bubble.appendChild(document.createTextNode(m.text));
-    if(m.sender === myChatName){
-      const seen = other.ts && other.ts > m.time;
-      const tick = document.createElement('span');
-      tick.className = 'seen-tick';
-      tick.textContent = seen ? '✓✓ اتشافت' : '✓ اتبعتت';
-      bubble.appendChild(tick);
-    }
-
-    const badges = document.createElement('div');
-    badges.className = 'reaction-badges';
-    const reactions = m.reactions || {};
-    Object.values(reactions).forEach(emoji=>{ badges.textContent += emoji; });
-
-    const picker = document.createElement('div');
-    picker.className = 'reaction-picker hidden';
-    REACTION_EMOJIS.forEach(emoji=>{
-      const span = document.createElement('span');
-      span.textContent = emoji;
-      span.addEventListener('click', (ev)=>{
-        ev.stopPropagation();
-        toggleReaction(m.id, emoji, reactions);
-        picker.classList.add('hidden');
-      });
-      picker.appendChild(span);
-    });
-
-    bubble.addEventListener('click', ()=>{ picker.classList.toggle('hidden'); });
-
-    wrap.appendChild(bubble);
-    wrap.appendChild(badges);
-    wrap.appendChild(picker);
-    chatMessagesEl.appendChild(wrap);
-  });
-  chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-}
-
-function toggleReaction(messageId, emoji, currentReactions){
-  if(!myChatName) return;
-  const ref = db.ref(`site/messages/${messageId}/reactions/${myChatName}`);
-  if(currentReactions[myChatName] === emoji){ ref.remove(); }
-  else{ ref.set(emoji); }
-}
-
-function updateStatusLine(){
-  const other = latestPresence[otherChatName()] || {};
-  const now = Date.now();
-  const online = other.ts && (now - other.ts < 8000);
-  const typing = other.typingTs && (now - other.typingTs < 3000);
-  chatStatusEl.classList.toggle('online', !!online);
-  if(typing) chatStatusEl.textContent = `${labelOf(otherChatName())} بيكتب دلوقتي...`;
-  else if(online) chatStatusEl.textContent = `${labelOf(otherChatName())} متصل/ة دلوقتي 🟢`;
-  else chatStatusEl.textContent = `${labelOf(otherChatName())} مش متصل/ة دلوقتي`;
-}
-
-let lastMessages = [];
-function showChatWindow(){
-  chatNameGate.classList.add('hidden');
-  chatWindow.classList.remove('hidden');
-  chatWhoami.textContent = `بتكتب كـ ${labelOf(myChatName)}`;
-
-  db.ref('site/messages').on('value', snap=>{
-    const val = snap.val() || {};
-    lastMessages = Object.entries(val)
-      .map(([id,m])=>({ id, ...m }))
-      .sort((a,b)=>a.time-b.time);
-    renderChatMessages(lastMessages);
-  });
-
-  db.ref('site/presence').on('value', snap=>{
-    latestPresence = snap.val() || {};
-    updateStatusLine();
-    renderChatMessages(lastMessages);
-  });
-
-  sendHeartbeat(false);
-  setInterval(()=>{ if(document.activeElement !== chatInput) sendHeartbeat(false); }, 6000);
-  setInterval(updateStatusLine, 3000); // keep online/typing text accurate even with no new events
-}
-
-document.querySelectorAll('.chat-name-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    myChatName = btn.dataset.name;
-    localStorage.setItem(CHAT_NAME_KEY, myChatName);
-    showChatWindow();
-  });
-});
-if(myChatName){ showChatWindow(); }
-
-let lastHeartbeatTs = 0;
-function sendHeartbeat(isTyping){
-  if(!myChatName) return;
-  const now = Date.now();
-  if(!isTyping && now - lastHeartbeatTs < 5000) return;
-  lastHeartbeatTs = now;
-  const myRef = db.ref(`site/presence/${myChatName}`);
-  myRef.once('value').then(snap=>{
-    const prev = snap.val() || {};
-    myRef.set({ ts: now, typingTs: isTyping ? now : (prev.typingTs || 0) });
-  });
-}
-
-let typingThrottled = false;
-chatInput.addEventListener('input', ()=>{
-  if(!typingThrottled){
-    typingThrottled = true;
-    sendHeartbeat(true);
-    setTimeout(()=>{ typingThrottled = false; }, 2000);
-  }
-});
-
-function sendChatMessage(){
-  const text = chatInput.value.trim();
-  if(!text || !myChatName) return;
-  chatInput.value = '';
-  db.ref('site/messages').push({ sender: myChatName, text, time: Date.now() });
-  db.ref(`site/presence/${myChatName}`).update({ ts: Date.now(), typingTs: 0 });
-}
-chatSendBtn.addEventListener('click', sendChatMessage);
-chatInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') sendChatMessage(); });
-</script>
-
-</body>
-</html>
+  .reaction-badges:empty{display:no
