@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ibrahim & Tota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300..800&family=Lalezar&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#160a20;
+    --bg-2:#2b0f35;
+    --grad-a:#ff3d81;
+    --grad-b:#9b4dff;
+    --grad-c:#ffb020;
+    --grad-d:#ff7a3d;
+    --glass:rgba(255,255,255,.06);
+    --glass-2:rgba(255,255,255,.09);
+    --glass-border:rgba(255,255,255,.14);
+    --text-hi:#fdf3f7;
+    --text-mid:#d8c3da;
+    --text-dim:#a68fab;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Cairo', sans-serif;
+    background:
+      radial-gradient(ellipse 65% 50% at 12% 5%, rgba(255,61,129,.4), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 92% 10%, rgba(155,77,255,.35), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 50% 95%, rgba(255,176,32,.22), transparent 60%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2) 55%, #1c0a24);
+    color:var(--text-mid);
+    overflow-x:hidden;
+    min-height:100%;
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+  :focus-visible{outline:2px solid var(--grad-a); outline-offset:3px; border-radius:6px;}
+
+  /* single ambient motion — two slow-drifting blurred orbs behind everything */
+  .mesh{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+  .mesh span{
+    position:absolute; border-radius:50%; filter:blur(70px); opacity:.4;
+    animation:drift 22s ease-in-out infinite alternate;
+  }
+  .mesh span:nth-child(1){width:340px; height:340px; background:var(--grad-a); top:-60px; right:-60px;}
+  .mesh span:nth-child(2){width:280px; height:280px; background:var(--grad-b); bottom:0; left:-80px; animation-delay:-6s;}
+  .mesh span:nth-child(3){width:220px; height:220px; background:var(--grad-c); top:45%; left:60%; animation-delay:-12s; opacity:.25;}
+  .mesh span:nth-child(4){width:200px; height:200px; background:var(--grad-d); bottom:10%; right:10%; animation-delay:-3s; opacity:.2;}
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1);}
+    100%{transform:translate(30px,-25px) scale(1.12);}
+  }
+
+  /* floating hearts rising through the background */
+  .hearts{position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;}
+  .hearts span{
+    position:absolute; bottom:-10%; font-size:18px;
+    animation:rise linear infinite;
+    filter:drop-shadow(0 0 6px rgba(255,61,129,.35));
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(0deg); opacity:0;}
+    10%{opacity:.85;}
+    90%{opacity:.6;}
+    100%{transform:translateY(-115vh) translateX(var(--drift,20px)) rotate(20deg); opacity:0;}
+  }
+
+  /* ---------- PASSWORD SCREEN ---------- */
+  #lock-screen{
+    position:fixed; inset:0; z-index:50;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,95,150,.35), transparent 60%),
+      var(--bg-1);
+    transition:opacity .7s ease, visibility .7s ease;
+  }
+  #lock-screen.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+  .lock-box{
+    background:var(--glass-2);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid var(--glass-border);
+    border-radius:28px;
+    padding:44px 32px;
+    width:100%;
+    max-width:380px;
+    text-align:center;
+    box-shadow:0 30px 70px rgba(0,0,0,.45);
+  }
+  .lock-heart{
+    width:34px; height:34px; margin:0 auto 14px;
+  }
+  .lock-title{
+    font-family:'Lalezar', sans-serif;
+    font-weight:400;
+    font-size:38px;
+    letter-spacing:.5px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom:6px;
+  }
+  .lock-sub{
+    font-weight:500;
+    font-size:16px;
+    color:var(--text-mid);
+    margin-bottom:28px;
+  }
+  #password-input{
+    width:100%;
+    padding:14px 18px;
+    border-radius:14px;
+    border:1px solid var(--glass-border);
+    background:rgba(255,255,255,.05);
+    font-family:'Cairo', sans-serif;
+    font-size:16px;
+    text-align:center;
+    outline:none;
+    color:var(--text-hi);
+    letter-spacing:2px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  #password-input::placeholder{color:var(--text-dim);}
+  #password-input:focus{border-color:var(--grad-a); box-shadow:0 0 0 4px rgba(255,95,150,.15);}
+  #unlock-btn{
+    margin-top:16px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    transition:transform .2s, box-shadow .2s;
+    box-shadow:0 10px 26px rgba(255,95,150,.3);
+  }
+  #unlock-btn:hover{transform:translateY(-2px); box-shadow:0 14px 32px rgba(255,95,150,.4);}
+  #lock-error{
+    margin-top:12px;
+    color:#ff9db8;
+    font-size:14px;
+    min-height:18px;
+  }
+
+  /* ---------- MAIN SITE ---------- */
+  #site{
+    position:relative; z-index:2;
+    max-width:640px;
+    margin:0 auto;
+    padding:48px 18px 140px;
+    opacity:0;
+    transition:opacity 1s ease;
+  }
+  #site.show{opacity:1;}
+
+  header.hero{
+    text-align:center;
+    padding:20px 10px 8px;
+  }
+  .names{
+    font-family:'Lalezar', sans-serif;
+    font-weight:400;
+    font-size:clamp(40px,11vw,60px);
+    letter-spacing:.5px;
+    background:linear-gradient(100deg,#ffd3e2,var(--grad-a) 45%,var(--grad-b));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    line-height:1.15;
+  }
+  .hero-line{
+    margin-top:10px;
+    font-weight:500;
+    font-size:16px;
+    color:var(--text-dim);
+  }
+  .divider{
+    width:64px; height:3px; margin:26px auto 0;
+    border-radius:3px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+  }
+
+  .glass-card{
+    background:var(--glass);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--glass-border);
+    border-radius:24px;
+    padding:30px 24px;
+  }
+
+  section{margin-bottom:30px;}
+  section h2{
+    font-weight:800;
+    font-size:20px;
+    color:var(--text-hi);
+    text-align:center;
+    margin-bottom:22px;
+  }
+  section h2 .dot{color:var(--grad-a);}
+
+  /* ---- counter ---- */
+  .counter-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    text-align:center;
+  }
+  .counter-box{
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--glass-border);
+    border-radius:16px;
+    padding:16px 4px;
+  }
+  .counter-num{
+    font-family:'Lalezar', sans-serif;
+    font-weight:400;
+    font-size:clamp(24px,6vw,32px);
+    background:linear-gradient(180deg,#fff,var(--grad-a));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .counter-label{
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin-top:4px;
+  }
+  .counter-note{
+    text-align:center;
+    margin-top:18px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-mid);
+  }
+
+  /* ---- letter ---- */
+  .letter{
+    font-weight:400;
+    font-size:16.5px;
+    line-height:2.05;
+    color:var(--text-mid);
+    white-space:pre-line;
+    text-align:justify;
+  }
+  .letter .signature{
+    display:flex; align-items:center; gap:10px;
+    margin-top:22px;
+    font-family:'Great Vibes', cursive;
+    font-size:34px;
+    color:var(--text-hi);
+  }
+  .heart-icon{width:22px; height:22px; flex:0 0 auto;}
+
+  /* ---- reply ---- */
+  #reply-box{
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid var(--glass-border);
+    background:rgba(255,255,255,.05);
+    font-family:'Cairo', sans-serif;
+    font-size:15.5px;
+    color:var(--text-hi);
+    resize:vertical;
+    outline:none;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  #reply-box::placeholder{color:var(--text-dim);}
+  #reply-box:focus{border-color:var(--grad-a); box-shadow:0 0 0 4px rgba(255,95,150,.12);}
+  #save-reply-btn{
+    display:block;
+    margin:16px auto 0;
+    padding:12px 36px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    transition:transform .2s;
+  }
+  #save-reply-btn:hover{transform:translateY(-1px);}
+  #reply-saved-note{
+    text-align:center;
+    color:var(--grad-c);
+    font-size:13.5px;
+    font-weight:600;
+    margin-top:10px;
+    min-height:16px;
+  }
+
+  /* ---- gallery ---- */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .pic-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--glass-border);
+    transition:transform .25s ease;
+  }
+  .pic-wrap:hover{transform:scale(1.04);}
+  .pic-wrap img,
+  .pic-wrap video{width:100%; height:100%; object-fit:cover; display:block;}
+  .pic-wrap .del-btn{
+    position:absolute; top:6px; left:6px;
+    width:24px; height:24px;
+    border:none; border-radius:50%;
+    background:rgba(20,10,25,.55);
+    backdrop-filter:blur(4px);
+    color:#fff;
+    font-size:13px; line-height:1;
+    cursor:pointer;
+  }
+  .empty-note{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:14.5px;
+    padding:6px 0 18px;
+  }
+  #upload-label{
+    display:block;
+    text-align:center;
+    padding:14px;
+    border:1.5px dashed var(--glass-border);
+    border-radius:14px;
+    color:var(--text-mid);
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:background .2s, border-color .2s;
+  }
+  #upload-label:hover{background:rgba(255,255,255,.04); border-color:var(--grad-a);}
+  #photo-input{display:none;}
+
+  footer.credit{
+    text-align:center;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-top:8px;
+  }
+
+  /* ---------- music player: floating glass pill ---------- */
+  #player-bar{
+    position:fixed; bottom:18px; left:50%;
+    transform:translate(-50%,140%);
+    z-index:40;
+    display:flex; align-items:center; gap:10px;
+    background:var(--glass-2);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border:1px solid var(--glass-border);
+    border-radius:999px;
+    padding:8px 10px 8px 16px;
+    max-width:92vw;
+    box-shadow:0 18px 40px rgba(0,0,0,.4);
+    transition:transform .6s ease;
+  }
+  #player-bar.show{transform:translate(-50%,0);}
+  #play-toggle{
+    flex:0 0 auto;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b));
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #song-info{
+    font-size:13.5px;
+    color:var(--text-mid);
+    max-width:150px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  #song-info b{color:var(--text-hi); font-weight:700;}
+  .note-icon{font-size:14px; animation:spin 3s linear infinite; animation-play-state:paused; display:inline-block;}
+  .note-icon.playing{animation-play-state:running;}
+  @keyframes spin{from{transform:rotate(0)} to{transform:rotate(360deg)}}
+  #song-upload-btn{
+    flex:0 0 auto;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--glass-border);
+    background:transparent;
+    color:var(--text-mid);
+    font-size:13px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #song-upload-btn:hover{background:rgba(255,255,255,.06); color:var(--text-hi);}
+</style>
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+<div class="hearts" id="hearts" aria-hidden="true"></div>
+
+<!-- ================= PASSWORD SCREEN ================= -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <svg class="lock-heart" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="hg1" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#ff5f96"/><stop offset="1" stop-color="#8a5cff"/></linearGradient></defs>
+      <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
+    </svg>
+    <div class="lock-title">Ibrahim &amp; Tota</div>
+    <div class="lock-sub">الدنيا الصغيرة بتاعتنا يا توتا 🌸</div>
+    <input type="password" id="password-input" placeholder="l o v e" />
+    <button id="unlock-btn">افتحي 💗</button>
+    <div id="lock-error"></div>
+  </div>
+</div>
+
+<!-- ================= MAIN SITE ================= -->
+<div id="site">
+
+  <header class="hero">
+    <div class="names">Ibrahim <span style="color:var(--grad-c); font-size:.7em;">&amp;</span> Tota</div>
+    <div class="hero-line">كل تفصيلة هنا ليكي يا توتا</div>
+    <div class="divider"></div>
+  </header>
+
+  <section id="counter-section">
+    <h2><span class="dot">·</span> إحنا مع بعض بقالنا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div class="counter-grid">
+        <div class="counter-box"><div class="counter-num" id="c-days">0</div><div class="counter-label">يوم</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-hours">0</div><div class="counter-label">ساعة</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-mins">0</div><div class="counter-label">دقيقة</div></div>
+        <div class="counter-box"><div class="counter-num" id="c-secs">0</div><div class="counter-label">ثانية</div></div>
+      </div>
+      <div class="counter-note">وكل ثانية فيهم بتساوي الدنيا 🌷</div>
+    </div>
+  </section>
+
+  <section id="letter-section">
+    <h2><span class="dot">·</span> كلمة من قلبي <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <div class="letter" id="letter-text">توتا يا روحي،
+
+هكتبلك كام سطر مش عشان اعبر عن كل اللي جوايا ده مستحيل يتقال بالكلام اصلا بس الكلام ده اقل حاجه تتوصف من حبي ليكي.
+
+من ساعه ما دخلتي حياتي وانا حاسس ان كل حاجه بقي ليها طعم تاني. ضحكتك بتنسيني تعبي وهمومي، وصوتك اول ما اسمعه بيريح قلبي، وكلامك الحلو ده اللي بيخلني احس ان مفيش حاجه.
+
+مفيش كلام يكفي يوصفلك حجم اللي حاسس بيه لما تكوني معايا يا قلبي.
+
+بحبك يا نور عيني وحياتي كلها.
+        <div class="signature">
+          <svg class="heart-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21s-7.5-4.6-10-9.2C.5 8.4 2.6 5 6.2 5c2 0 3.6 1 4.8 2.6C12.2 6 13.8 5 15.8 5c3.6 0 5.7 3.4 4.2 6.8C19.5 16.4 12 21 12 21z" fill="url(#hg1)"/>
+          </svg>
+          Ibrahim
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reply-section">
+    <h2><span class="dot">·</span> دلوقتي دورك يا توتا <span class="dot">·</span></h2>
+    <div class="glass-card">
+      <textarea id="reply-box" placeholder="اكتبيلي اللي في قلبك يا توتا... 💌" rows="5"></textarea>
+      <button id="save-reply-btn">احفظي 💗</button>
+      <div id="reply-saved-note"></div>
+    </div>
+  </section>
+
+  <section id="gallery-section">
+    <h2><span class="dot">·</span> لحظاتنا <span class="dot">·</span></h2>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <div class="empty-note" id="empty-note">لسه مفيش صور أو فيديوهات هنا</div>
+  </section>
+
+  <footer class="credit">بحبك من كل قلبي 💗</footer>
+</div>
+
+<!-- ================= MUSIC PLAYER ================= -->
+
+<div id="player-bar">
+  <button id="play-toggle">▶</button>
+  <div id="song-info"><span class="note-icon" id="note-icon">🎵</span> <b id="song-name">توليت — إنت حبيبي</b></div>
+  <audio id="bg-audio" src="song.mp3" loop preload="none"></audio>
+</div>
+
+<script>
+/* ================= floating hearts (single ambient effect) ================= */
+(function(){
+  const wrap = document.getElementById('hearts');
+  const icons = ['💗','❤️','💕','💓'];
+  for(let i=0;i<16;i++){
+    const s = document.createElement('span');
+    s.textContent = icons[Math.floor(Math.random()*icons.length)];
+    s.style.left = Math.random()*100+'%';
+    s.style.fontSize = (14+Math.random()*16)+'px';
+    s.style.setProperty('--drift', (Math.random()*60-30)+'px');
+    s.style.animationDuration = (12+Math.random()*14)+'s';
+    s.style.animationDelay = (Math.random()*16)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
+/* ================= password lock ================= */
+const CORRECT_PASSWORD = "love";
+const lockScreen = document.getElementById('lock-screen');
+const pwInput = document.getElementById('password-input');
+const unlockBtn = document.getElementById('unlock-btn');
+const lockError = document.getElementById('lock-error');
+const site = document.getElementById('site');
+const playerBar = document.getElementById('player-bar');
+const audio = document.getElementById('bg-audio');
+
+function tryUnlock(){
+  if(pwInput.value.trim().toLowerCase() === CORRECT_PASSWORD){
+    lockScreen.classList.add('hidden');
+    site.classList.add('show');
+    playerBar.classList.add('show');
+    startCounter();
+    attemptAutoplay();
+  } else {
+    lockError.textContent = "الباسورد غلط، جربي تاني 🌷";
+    pwInput.value = '';
+  }
+}
+unlockBtn.addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+
+/* ================= counter ================= */
+// تاريخ البداية متخزن هنا من غير ما يتعرض في الصفحة
+const START_TIME = new Date(2026, 7, 9, 3, 6, 0).getTime(); // شهر 7 = أغسطس (index من صفر)
+
+function startCounter(){
+  updateCounter();
+  setInterval(updateCounter, 1000);
+}
+function updateCounter(){
+  const now = Date.now();
+  let diff = Math.max(0, now - START_TIME);
+  const days = Math.floor(diff/(1000*60*60*24));
+  const hours = Math.floor((diff/(1000*60*60))%24);
+  const mins = Math.floor((diff/(1000*60))%60);
+  const secs = Math.floor((diff/1000)%60);
+  document.getElementById('c-days').textContent = days;
+  document.getElementById('c-hours').textContent = hours;
+  document.getElementById('c-mins').textContent = mins;
+  document.getElementById('c-secs').textContent = secs;
+}
+
+/* ================= music player (song is fixed — set via song.mp3) ================= */
+const playToggle = document.getElementById('play-toggle');
+const noteIcon = document.getElementById('note-icon');
+
+function attemptAutoplay(){
+  if(!audio.src) return;
+  const p = audio.play();
+  if(p !== undefined){
+    p.then(()=>{ setPlayingUI(true); })
+     .catch(()=>{ setPlayingUI(false); });
+  }
+}
+function setPlayingUI(playing){
+  playToggle.textContent = playing ? '⏸' : '▶';
+  noteIcon.classList.toggle('playing', playing);
+}
+playToggle.addEventListener('click', ()=>{
+  if(audio.paused){
+    audio.play().then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false));
+  } else {
+    audio.pause();
+    setPlayingUI(false);
+  }
+});
+audio.addEventListener('pause', ()=>setPlayingUI(false));
+audio.addEventListener('play', ()=>setPlayingUI(true));
+
+/* ================= gallery: photos & videos (view-only — content is fixed by Ibrahim) ================= */
+const galleryGrid = document.getElementById('gallery-grid');
+const emptyNote = document.getElementById('empty-note');
+
+/* Fixed media list — edited directly in the code, not from the page.
+   Add entries here as {src:'filename.jpg', type:'image'} or {src:'filename.mp4', type:'video'}
+   and place the matching file next to this HTML file. */
+const GALLERY_ITEMS = [];
+
+function renderGallery(){
+  galleryGrid.innerHTML = '';
+  emptyNote.style.display = GALLERY_ITEMS.length ? 'none' : 'block';
+  GALLERY_ITEMS.forEach(item=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'pic-wrap';
+    let media;
+    if(item.type === 'video'){
+      media = document.createElement('video');
+      media.src = item.src;
+      media.controls = true;
+      media.playsInline = true;
+    } else {
+      media = document.createElement('img');
+      media.src = item.src;
+      media.alt = '';
+    }
+    wrap.appendChild(media);
+    galleryGrid.appendChild(wrap);
+  });
+}
+renderGallery();
+
+/* ================= her reply box ================= */
+const replyBox = document.getElementById('reply-box');
+const saveReplyBtn = document.getElementById('save-reply-btn');
+const replySavedNote = document.getElementById('reply-saved-note');
+const REPLY_KEY = 'ibrahim_tota_reply';
+
+function loadReply(){
+  const saved = localStorage.getItem(REPLY_KEY);
+  if(saved){ replyBox.value = saved; }
+}
+saveReplyBtn.addEventListener('click', ()=>{
+  localStorage.setItem(REPLY_KEY, replyBox.value);
+  replySavedNote.textContent = 'اتحفظ يا قمر 💌';
+  setTimeout(()=>{ replySavedNote.textContent = ''; }, 2500);
+});
+loadReply();
+</script>
+</body>
+</html>
